@@ -20,4 +20,13 @@ public class Payment {
 
     @Column(name = "PaymentStatus")
     private String paymentStatus;
+
+    public Long getPaymentID() {
+        return paymentID;
+    }
+
+    public void setPaymentID(Long paymentID) {
+        this.paymentID = paymentID;
+    }
+
 }

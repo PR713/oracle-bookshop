@@ -37,4 +37,12 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer")
     private List<Order> orders;
+
+    public Long getCustomerID() {
+        return customerID;
+    }
+
+    public void setCustomerID(Long customerID) {
+        this.customerID = customerID;
+    }
 }

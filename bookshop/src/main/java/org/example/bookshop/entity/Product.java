@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Product {
     @Id
     @Column(name = "ProductID")
-    private Long id;
+    private Long productId;
 
     @Column(name = "ProductName")
     private String name;
@@ -26,5 +26,11 @@ public class Product {
     private Category category;
 
 
-    //gettery settery konstruktor
+    public Long getProductID() {
+        return productId;
+    }
+
+    public void setProductID(Long productID) {
+        this.productId = productID;
+    }
 }

@@ -8,6 +8,8 @@ import java.time.LocalDate;
 @Table(name = "Payments")
 public class Payment {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
     @Column(name = "PaymentID")
     private Long paymentID;
 

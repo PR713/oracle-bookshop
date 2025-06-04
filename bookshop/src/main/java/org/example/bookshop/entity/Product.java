@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "Products")
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
     @Column(name = "ProductID")
     private Long productId;
 
@@ -33,4 +35,8 @@ public class Product {
     public void setProductID(Long productID) {
         this.productId = productID;
     }
+
+    public Integer getStock() {return stock;}
+
+    public void setStock(Integer stock) {this.stock = stock;}
 }

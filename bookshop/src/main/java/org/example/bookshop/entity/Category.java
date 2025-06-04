@@ -9,6 +9,8 @@ import java.util.List;
 @Table(name = "Categories")
 public class Category {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
     @Column(name = "CategoryID")
     private Long categoryID;
 

@@ -9,6 +9,8 @@ import java.util.List;
 @Table(name = "Orders")
 public class Order {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
     @Column(name = "OrderID")
     private Long orderID;
 
@@ -38,5 +40,18 @@ public class Order {
 
     public void setOrderID(Long orderID) {
         this.orderID = orderID;
+    }
+
+    public void setOrderDate(LocalDate orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+
+    public void setProduct(Product product) {
+        //TODO Products są w OrderDetails (?)
     }
 }

@@ -7,6 +7,8 @@ import java.util.List;
 @Table(name = "Shippers")
 public class Shipper {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
     @Column(name = "ShipperID")
     private Long shipperID;
 

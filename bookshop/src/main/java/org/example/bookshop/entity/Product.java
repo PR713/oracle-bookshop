@@ -3,28 +3,28 @@ package org.example.bookshop.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Products")
+@Table(name = "PRODUCTS")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
     @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
-    @Column(name = "ProductID")
+    @Column(name = "PRODUCT_ID")
     private Long productId;
 
-    @Column(name = "ProductName")
+    @Column(name = "PRODUCT_NAME")
     private String name;
 
-    @Column(name = "Price")
+    @Column(name = "PRICE")
     private Float price;
 
-    @Column(name = "StockQuantity")
+    @Column(name = "STOCK_QUANTITY")
     private Integer stock;
 
-    @Column(name = "Rating")
+    @Column(name = "RATING")
     private Integer rating;
 
     @ManyToOne
-    @JoinColumn(name = "CategoryID")
+    @JoinColumn(name = "CATEGORY_ID")
     private Category category;
 
 
@@ -46,5 +46,29 @@ public class Product {
 
     public Float getPrice() {
         return price;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(Float price) {
+        this.price = price;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

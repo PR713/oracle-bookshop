@@ -5,7 +5,6 @@ import org.example.bookshop.entity.*;
 import org.example.bookshop.repository.*;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,17 +17,19 @@ public class PurchaseService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final OrderService orderService;
 
     public PurchaseService(ProductRepository productRepository,
                            CustomerRepository customerRepository,
                            OrderRepository orderRepository,
                            PaymentRepository paymentRepository,
-                           OrderDetailRepository orderDetailRepository) {
+                           OrderDetailRepository orderDetailRepository, OrderService orderService) {
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.orderDetailRepository = orderDetailRepository;
+        this.orderService = orderService;
     }
 
     @Transactional
@@ -54,9 +55,7 @@ public class PurchaseService {
         order.setCustomer(customer);
         order.setOrderDate(LocalDate.now());
         order.setOrderStatus("NEW");
-        order = orderRepository.save(order);
-
-        BigDecimal totalPrice = new BigDecimal(0);
+        orderService.save(order);
 
         for (Map.Entry<Product, Integer> entry : productsToOrder.entrySet()) {
             Product product = entry.getKey();
@@ -70,10 +69,14 @@ public class PurchaseService {
             orderDetail.setUnitPrice(product.getPrice());
             orderDetail.setDiscount(0.2F);
             orderDetailRepository.save(orderDetail);
-
-            totalPrice = totalPrice.add(BigDecimal.valueOf(product.getPrice() * entry.getValue() * (1 - orderDetail.getDiscount())));
-
         }
+
+
+        Payment payment = new Payment();
+        payment.setPaymentDate(LocalDate.now());
+        payment.setOrder(order);
+        payment.setPaymentStatus("NEW");
+        paymentRepository.save(payment);
     }
 
 }

@@ -3,25 +3,26 @@ package org.example.bookshop.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "GameDetails")
+@Table(name = "GAME_DETAILS")
 public class GameDetail {
     @Id
-    @Column(name = "GameID")
+    @Column(name = "GAME_ID")
     private Long gameID;
 
     @OneToOne
-    @JoinColumn(name = "GameID")
+    @MapsId
+    @JoinColumn(name = "GAME_ID")
     private Product product;
 
-    @Column(name = "Platform")
+    @Column(name = "PLATFORM")
     private String platform;
 
-    @Column(name = "Developer")
+    @Column(name = "DEVELOPER")
     private String developer;
 
-    @Column(name = "ReleaseYear")
+    @Column(name = "RELEASE_YEAR")
     private Integer releaseYear;
 
-    @Column(name = "Description")
+    @Column(name = "DESCRIPTION")
     private String description;
 }

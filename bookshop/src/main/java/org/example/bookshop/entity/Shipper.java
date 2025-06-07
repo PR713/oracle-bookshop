@@ -4,18 +4,18 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "Shippers")
+@Table(name = "SHIPPERS")
 public class Shipper {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
-    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
-    @Column(name = "ShipperID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shipper_seq")
+    @SequenceGenerator(name = "shipper_seq", sequenceName = "SHIPPER_SEQ", allocationSize = 1)
+    @Column(name = "SHIPPER_ID")
     private Long shipperID;
 
-    @Column(name = "CompanyName")
+    @Column(name = "COMPANY_NAME")
     private String companyName;
 
-    @Column(name = "Phone")
+    @Column(name = "PHONE")
     private String phone;
 
     @OneToMany(mappedBy = "shipVia")

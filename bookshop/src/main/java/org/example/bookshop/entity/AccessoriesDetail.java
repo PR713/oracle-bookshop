@@ -3,17 +3,18 @@ package org.example.bookshop.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "AccessoriesDetails")
+@Table(name = "ACCESSORIES_DETAILS")
 public class AccessoriesDetail {
     @Id
-    @Column(name = "AccessoryID")
+    @Column(name = "ACCESSORY_ID")
     private Long accessoryID;
 
     @OneToOne
-    @JoinColumn(name = "AccessoryID")
+    @MapsId
+    @JoinColumn(name = "ACCESSORY_ID")
     private Product product;
 
-    @Column(name = "Description")
+    @Column(name = "DESCRIPTION")
     private String description;
 }
 

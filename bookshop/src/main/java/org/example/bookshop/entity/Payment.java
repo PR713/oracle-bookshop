@@ -5,22 +5,22 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Payments")
+@Table(name = "PAYMENTS")
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
-    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
-    @Column(name = "PaymentID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_seq")
+    @SequenceGenerator(name = "payment_seq", sequenceName = "PAYMENT_SEQ", allocationSize = 1)
+    @Column(name = "PAYMENT_ID")
     private Long paymentID;
 
     @ManyToOne
-    @JoinColumn(name = "OrderID")
+    @JoinColumn(name = "ORDER_ID")
     private Order order;
 
-    @Column(name = "PaymentDate")
+    @Column(name = "PAYMENT_DATE")
     private LocalDate paymentDate;
 
-    @Column(name = "PaymentStatus")
+    @Column(name = "PAYMENT_STATUS")
     private String paymentStatus;
 
     public Long getPaymentID() {
@@ -31,4 +31,27 @@ public class Payment {
         this.paymentID = paymentID;
     }
 
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public LocalDate getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 }

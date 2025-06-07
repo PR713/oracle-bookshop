@@ -21,8 +21,8 @@ public class PurchaseController {
             @RequestParam Long customerId,
             @RequestBody Map<Long, Integer> productQuantities) {
         try {
-            Order order = purchaseService.purchaseProducts(customerId, productQuantities);
-            return ResponseEntity.ok(order);
+            purchaseService.purchaseProducts(customerId, productQuantities);
+            return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }

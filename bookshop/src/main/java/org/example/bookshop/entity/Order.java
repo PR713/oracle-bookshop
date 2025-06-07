@@ -6,26 +6,26 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "Orders")
+@Table(name = "ORDERS")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
-    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
-    @Column(name = "OrderID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
+    @SequenceGenerator(name = "order_seq", sequenceName = "ORDER_SEQ", allocationSize = 1)
+    @Column(name = "ORDER_ID")
     private Long orderID;
 
     @ManyToOne
-    @JoinColumn(name = "CustomerID")
+    @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
-    @Column(name = "OrderDate")
+    @Column(name = "ORDER_DATE")
     private LocalDate orderDate;
 
-    @Column(name = "OrderStatus")
+    @Column(name = "ORDER_STATUS")
     private String orderStatus;
 
     @ManyToOne
-    @JoinColumn(name = "ShipVia")
+    @JoinColumn(name = "SHIP_VIA")
     private Shipper shipVia;
 
     @OneToMany(mappedBy = "order")

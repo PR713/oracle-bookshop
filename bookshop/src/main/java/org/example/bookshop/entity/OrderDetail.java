@@ -3,28 +3,28 @@ package org.example.bookshop.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "OrderDetails")
+@Table(name = "ORDER_DETAILS")
 public class OrderDetail {
     @EmbeddedId
     private OrderDetailId id;
 
-    @Column(name = "Quantity")
+    @Column(name = "QUANTITY")
     private Integer quantity;
 
-    @Column(name = "UnitPrice")
+    @Column(name = "UNIT_PRICE")
     private Float unitPrice;
 
-    @Column(name = "Discount")
+    @Column(name = "DISCOUNT")
     private Float discount;
 
     @ManyToOne
     @MapsId("orderID")
-    @JoinColumn(name = "OrderID")
+    @JoinColumn(name = "ORDER_ID")
     private Order order;
 
     @ManyToOne
     @MapsId("productID")
-    @JoinColumn(name = "ProductID")
+    @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
 

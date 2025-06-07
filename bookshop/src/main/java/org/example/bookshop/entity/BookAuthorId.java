@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 @Embeddable
 public class BookAuthorId implements Serializable {
-    @Column(name = "BookID")
+    @Column(name = "BOOK_ID")
     private Long bookID;
 
-    @Column(name = "AuthorID")
+    @Column(name = "AUTHOR_ID")
     private Long authorID;
 }

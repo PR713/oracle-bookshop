@@ -1,214 +1,265 @@
+-- TABLES
+-- TABLE: ACCESSORIES_DETAILS
+CREATE TABLE ACCESSORIES_DETAILS (
+                                     ACCESSORY_ID NUMBER NOT NULL,
+                                     DESCRIPTION VARCHAR2(100) NOT NULL,
+                                     CONSTRAINT ACCESSORIES_DETAILS_PK PRIMARY KEY (ACCESSORY_ID)
+);
 
--- tables
--- Table: AccessoriesDetails
-CREATE TABLE AccessoriesDetails (
-    AccessoryID number  NOT NULL,
-    Description varchar2(100)  NOT NULL,
-    CONSTRAINT AccessoriesDetails_pk PRIMARY KEY (AccessoryID)
-) ;
+-- TABLE: AUTHORS
+CREATE TABLE AUTHORS (
+                         AUTHOR_ID NUMBER NOT NULL,
+                         FIRST_NAME VARCHAR2(100) NOT NULL,
+                         LAST_NAME VARCHAR2(100) NOT NULL,
+                         BIOGRAPHY VARCHAR2(100) NOT NULL,
+                         CONSTRAINT AUTHORS_PK PRIMARY KEY (AUTHOR_ID)
+);
 
--- Table: Authors
-CREATE TABLE Authors (
-    AuthorID number  NOT NULL,
-    FirstName varchar2(100)  NOT NULL,
-    LastName varchar2(100)  NOT NULL,
-    Biography varchar2(100)  NOT NULL,
-    CONSTRAINT Authors_pk PRIMARY KEY (AuthorID)
-) ;
+-- TABLE: BOOK_AUTHORS
+CREATE TABLE BOOK_AUTHORS (
+                              BOOK_ID NUMBER NOT NULL,
+                              AUTHOR_ID NUMBER NOT NULL,
+                              CONSTRAINT BOOK_AUTHORS_PK PRIMARY KEY (BOOK_ID, AUTHOR_ID)
+);
 
--- Table: BookAuthors
-CREATE TABLE BookAuthors (
-    BookID number  NOT NULL,
-    AuthorID number  NOT NULL,
-    CONSTRAINT BookAuthors_pk PRIMARY KEY (BookID,AuthorID)
-) ;
+-- TABLE: BOOK_DETAILS
+CREATE TABLE BOOK_DETAILS (
+                              BOOK_ID NUMBER NOT NULL,
+                              ISBN VARCHAR2(20) NOT NULL,
+                              PUBLICATION_YEAR NUMBER NOT NULL,
+                              PUBLISHER_ID NUMBER NOT NULL,
+                              LANGUAGE VARCHAR2(50) NOT NULL,
+                              PAGE_COUNT NUMBER NOT NULL,
+                              DESCRIPTION VARCHAR2(100) NOT NULL,
+                              CONSTRAINT PAGES CHECK (PAGE_COUNT > 0),
+                              CONSTRAINT YEAR CHECK (PUBLICATION_YEAR >= 1900),
+                              CONSTRAINT BOOK_DETAILS_PK PRIMARY KEY (BOOK_ID)
+);
 
--- Table: BookDetails
-CREATE TABLE BookDetails (
-    BookID number  NOT NULL,
-    ISBN varchar2(20)  NOT NULL,
-    PublicationYear number  NOT NULL,
-    PublisherID number  NOT NULL,
-    Language varchar2(50)  NOT NULL,
-    PageCount number  NOT NULL,
-    Description varchar2(100)  NOT NULL,
-    CONSTRAINT Pages CHECK (PageCount > 0),
-    CONSTRAINT Year CHECK (PublicationYear >= 1900 ),
-    CONSTRAINT BookDetails_pk PRIMARY KEY (BookID)
-) ;
+-- TABLE: CATEGORIES
+CREATE TABLE CATEGORIES (
+                            CATEGORY_ID NUMBER NOT NULL,
+                            CATEGORY_NAME VARCHAR2(50) NOT NULL,
+                            CONSTRAINT CATEGORIES_PK PRIMARY KEY (CATEGORY_ID)
+);
 
--- Table: Categories
-CREATE TABLE Categories (
-    CategoryID number  NOT NULL,
-    CategoryName varchar2(50)  NOT NULL,
-    CONSTRAINT Categories_pk PRIMARY KEY (CategoryID)
-) ;
+-- TABLE: CUSTOMERS
+CREATE TABLE CUSTOMERS (
+                           CUSTOMER_ID NUMBER NOT NULL,
+                           FIRST_NAME VARCHAR2(100) NOT NULL,
+                           LAST_NAME VARCHAR2(100) NOT NULL,
+                           EMAIL VARCHAR2(100) NOT NULL,
+                           PHONE VARCHAR2(20) NOT NULL,
+                           ADDRESS VARCHAR2(200) NOT NULL,
+                           CITY VARCHAR2(50) NOT NULL,
+                           POSTAL_CODE VARCHAR2(10) NOT NULL,
+                           COUNTRY VARCHAR2(50) NOT NULL,
+                           CONSTRAINT CUSTOMERS_PK PRIMARY KEY (CUSTOMER_ID)
+);
 
--- Table: Customers
-CREATE TABLE Customers (
-    CustomerID number  NOT NULL,
-    FirstName varchar2(100)  NOT NULL,
-    LastName varchar2(100)  NOT NULL,
-    Email varchar2(100)  NOT NULL,
-    Phone varchar2(20)  NOT NULL,
-    Address varchar2(200)  NOT NULL,
-    City varchar2(50)  NOT NULL,
-    PostalCode varchar2(10)  NOT NULL,
-    Country varchar2(50)  NOT NULL,
-    CONSTRAINT Customers_pk PRIMARY KEY (CustomerID)
-) ;
+-- TABLE: GAME_DETAILS
+CREATE TABLE GAME_DETAILS (
+                              GAME_ID NUMBER NOT NULL,
+                              PLATFORM VARCHAR2(50) NOT NULL,
+                              DEVELOPER VARCHAR2(50) NOT NULL,
+                              RELEASE_YEAR NUMBER NOT NULL,
+                              DESCRIPTION VARCHAR2(100) NOT NULL,
+                              CONSTRAINT R_YEAR CHECK (RELEASE_YEAR >= 1900),
+                              CONSTRAINT GAME_DETAILS_PK PRIMARY KEY (GAME_ID)
+);
 
--- Table: GameDetails
-CREATE TABLE GameDetails (
-    GameID number  NOT NULL,
-    Platform varchar2(50)  NOT NULL,
-    Developer varchar2(50)  NOT NULL,
-    ReleaseYear number  NOT NULL,
-    Description varchar2(100)  NOT NULL,
-    CONSTRAINT RYear CHECK (ReleaseYear >= 1900 ),
-    CONSTRAINT GameDetails_pk PRIMARY KEY (GameID)
-) ;
+-- TABLE: MOVIE_DETAILS
+CREATE TABLE MOVIE_DETAILS (
+                               MOVIE_ID NUMBER NOT NULL,
+                               DIRECTOR VARCHAR2(100) NOT NULL,
+                               DURATION_IN_MINUTES NUMBER NOT NULL,
+                               RELEASE_YEAR NUMBER NOT NULL,
+                               LANGUAGE VARCHAR2(50) NOT NULL,
+                               GENRE VARCHAR2(50) NOT NULL,
+                               DESCRIPTION VARCHAR2(100) NOT NULL,
+                               CONSTRAINT TIME CHECK (DURATION_IN_MINUTES > 0),
+                               CONSTRAINT MOVIE_DETAILS_PK PRIMARY KEY (MOVIE_ID)
+);
 
--- Table: MovieDetails
-CREATE TABLE MovieDetails (
-    MovieID number  NOT NULL,
-    Director varchar2(100)  NOT NULL,
-    DurationInMinutes number  NOT NULL,
-    ReleaseYear number  NOT NULL,
-    Language varchar2(50)  NOT NULL,
-    Genre varchar2(50)  NOT NULL,
-    Description varchar2(100)  NOT NULL,
-    CONSTRAINT Time CHECK (DurationInMinutes > 0 ),
-    CONSTRAINT MovieDetails_pk PRIMARY KEY (MovieID)
-) ;
+-- TABLE: ORDER_DETAILS
+CREATE TABLE ORDER_DETAILS (
+                               ORDER_ID NUMBER NOT NULL,
+                               PRODUCT_ID NUMBER NOT NULL,
+                               QUANTITY NUMBER NOT NULL,
+                               UNIT_PRICE NUMBER(10,2) NOT NULL,
+                               DISCOUNT NUMBER(10,2) NOT NULL,
+                               CONSTRAINT DISCOUNT CHECK (DISCOUNT >= 0 AND DISCOUNT <= 1),
+                               CONSTRAINT ORDER_DETAILS_PK PRIMARY KEY (PRODUCT_ID, ORDER_ID)
+);
 
--- Table: OrderDetails
-CREATE TABLE OrderDetails (
-    OrderID number  NOT NULL,
-    ProductID number  NOT NULL,
-    Quantity number  NOT NULL,
-    UnitPrice number(10,2)  NOT NULL,
-    Discount number(10,2)  NOT NULL,
-    CONSTRAINT Discount CHECK (Discount >= 0 AND Discount <= 1 ),
-    CONSTRAINT OrderDetails_pk PRIMARY KEY (ProductID,OrderID)
-) ;
+-- TABLE: ORDERS
+CREATE TABLE ORDERS (
+                        ORDER_ID NUMBER NOT NULL,
+                        CUSTOMER_ID NUMBER NOT NULL,
+                        ORDER_DATE DATE NOT NULL,
+                        ORDER_STATUS VARCHAR2(20) NOT NULL,
+                        SHIP_VIA NUMBER NOT NULL,
+                        CONSTRAINT ORDER_STATUS CHECK (ORDER_STATUS IN ('NEW', 'CANCELLED', 'COMPLETED', 'PROCESSING')),
+                        CONSTRAINT ORDERS_PK PRIMARY KEY (ORDER_ID)
+);
 
--- Table: Orders
-CREATE TABLE Orders (
-    OrderID number  NOT NULL,
-    CustomerID number  NOT NULL,
-    OrderDate date  NOT NULL,
-    OrderStatus varchar2(20)  NOT NULL,
-    ShipVia number  NOT NULL,
-    CONSTRAINT OrderStatus CHECK (OrderStatus IN ('NEW', 'CANCELLED', 'COMPLETED', 'PROCESSING')),
-    CONSTRAINT Orders_pk PRIMARY KEY (OrderID)
-) ;
+-- TABLE: PAYMENTS
+CREATE TABLE PAYMENTS (
+                          PAYMENT_ID NUMBER NOT NULL,
+                          ORDER_ID NUMBER NOT NULL,
+                          PAYMENT_DATE DATE NOT NULL,
+                          PAYMENT_STATUS VARCHAR2(20) NOT NULL,
+                          CONSTRAINT PAYMENT_STATUS CHECK (PAYMENT_STATUS IN ('NEW', 'PAID', 'FAILED')),
+                          CONSTRAINT PAYMENTS_PK PRIMARY KEY (PAYMENT_ID)
+);
 
--- Table: Payments
-CREATE TABLE Payments (
-    PaymentID number  NOT NULL,
-    OrderID number  NOT NULL,
-    PaymentDate date  NOT NULL,
-    PaymentStatus varchar2(20)  NOT NULL,
-    CONSTRAINT PaymentStatus CHECK (PaymentStatus IN ('NEW', 'PAID', 'FAILED')),
-    CONSTRAINT Payments_pk PRIMARY KEY (PaymentID)
-) ;
+-- TABLE: PRODUCTS
+CREATE TABLE PRODUCTS (
+                          PRODUCT_ID NUMBER NOT NULL,
+                          PRODUCT_NAME VARCHAR2(50) NOT NULL,
+                          PRICE NUMBER(10,2) NOT NULL,
+                          STOCK_QUANTITY NUMBER NOT NULL,
+                          CATEGORY_ID NUMBER NOT NULL,
+                          RATING NUMBER(1) NOT NULL,
+                          CONSTRAINT RATING CHECK (RATING BETWEEN 1 AND 5),
+                          CONSTRAINT PRODUCTS_PK PRIMARY KEY (PRODUCT_ID)
+);
 
--- Table: Products
-CREATE TABLE Products (
-    ProductID number  NOT NULL,
-    ProductName varchar2(50)  NOT NULL,
-    Price number(10,2)  NOT NULL,
-    StockQuantity number  NOT NULL,
-    CategoryID number  NOT NULL,
-    Rating number(1)  NOT NULL,
-    CONSTRAINT Rating CHECK (Rating BETWEEN 1 AND 5 ),
-    CONSTRAINT Products_pk PRIMARY KEY (ProductID)
-) ;
+-- TABLE: PUBLISHERS
+CREATE TABLE PUBLISHERS (
+                            PUBLISHER_ID NUMBER NOT NULL,
+                            PUBLISHER_NAME VARCHAR2(100) NOT NULL,
+                            COUNTRY VARCHAR2(50) NOT NULL,
+                            CONSTRAINT PUBLISHERS_PK PRIMARY KEY (PUBLISHER_ID)
+);
 
--- Table: Publishers
-CREATE TABLE Publishers (
-    PublisherID number  NOT NULL,
-    PublisherName varchar2(100)  NOT NULL,
-    Country varchar2(50)  NOT NULL,
-    CONSTRAINT Publishers_pk PRIMARY KEY (PublisherID)
-) ;
+-- TABLE: SHIPPERS
+CREATE TABLE SHIPPERS (
+                          SHIPPER_ID NUMBER NOT NULL,
+                          COMPANY_NAME VARCHAR2(100) NOT NULL,
+                          PHONE NUMBER(20) NOT NULL,
+                          CONSTRAINT SHIPPERS_PK PRIMARY KEY (SHIPPER_ID)
+);
 
--- Table: Shippers
-CREATE TABLE Shippers (
-    ShipperID number  NOT NULL,
-    CompanyName varchar2(100)  NOT NULL,
-    Phone number(20)  NOT NULL,
-    CONSTRAINT Shippers_pk PRIMARY KEY (ShipperID)
-) ;
+-- FOREIGN KEYS
+-- REFERENCE: AUTHORS_BOOK_AUTHORS (TABLE: BOOK_AUTHORS)
+ALTER TABLE BOOK_AUTHORS ADD CONSTRAINT AUTHORS_BOOK_AUTHORS
+    FOREIGN KEY (AUTHOR_ID)
+        REFERENCES AUTHORS (AUTHOR_ID);
 
--- foreign keys
--- Reference: Authors_BookAuthors (table: BookAuthors)
-ALTER TABLE BookAuthors ADD CONSTRAINT Authors_BookAuthors
-    FOREIGN KEY (AuthorID)
-    REFERENCES Authors (AuthorID);
+-- REFERENCE: BOOK_DETAILS_BOOK_AUTHORS (TABLE: BOOK_AUTHORS)
+ALTER TABLE BOOK_AUTHORS ADD CONSTRAINT BOOK_DETAILS_BOOK_AUTHORS
+    FOREIGN KEY (BOOK_ID)
+        REFERENCES BOOK_DETAILS (BOOK_ID);
 
--- Reference: BookDetails_BookAuthors (table: BookAuthors)
-ALTER TABLE BookAuthors ADD CONSTRAINT BookDetails_BookAuthors
-    FOREIGN KEY (BookID)
-    REFERENCES BookDetails (BookID);
+-- REFERENCE: BOOK_DETAILS_PUBLISHERS (TABLE: BOOK_DETAILS)
+ALTER TABLE BOOK_DETAILS ADD CONSTRAINT BOOK_DETAILS_PUBLISHERS
+    FOREIGN KEY (PUBLISHER_ID)
+        REFERENCES PUBLISHERS (PUBLISHER_ID);
 
--- Reference: BookDetails_Publishers (table: BookDetails)
-ALTER TABLE BookDetails ADD CONSTRAINT BookDetails_Publishers
-    FOREIGN KEY (PublisherID)
-    REFERENCES Publishers (PublisherID);
+ALTER TABLE BOOK_DETAILS ADD CONSTRAINT UNIQUE_ISBN UNIQUE (ISBN);
 
-ALTER TABLE BookDetails ADD CONSTRAINT unique_isbn UNIQUE (ISBN);
+-- REFERENCE: MOVIE_DETAILS_PRODUCTS (TABLE: MOVIE_DETAILS)
+ALTER TABLE MOVIE_DETAILS ADD CONSTRAINT MOVIE_DETAILS_PRODUCTS
+    FOREIGN KEY (MOVIE_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
 
--- Reference: MovieDetails_Products (table: MovieDetails)
-ALTER TABLE MovieDetails ADD CONSTRAINT MovieDetails_Products
-    FOREIGN KEY (MovieID)
-    REFERENCES Products (ProductID);
+-- REFERENCE: ORDER_DETAILS_ORDERS (TABLE: ORDER_DETAILS)
+ALTER TABLE ORDER_DETAILS ADD CONSTRAINT ORDER_DETAILS_ORDERS
+    FOREIGN KEY (ORDER_ID)
+        REFERENCES ORDERS (ORDER_ID);
 
--- Reference: OrderDetails_Orders (table: OrderDetails)
-ALTER TABLE OrderDetails ADD CONSTRAINT OrderDetails_Orders
-    FOREIGN KEY (OrderID)
-    REFERENCES Orders (OrderID);
+-- REFERENCE: ORDERS_CUSTOMERS (TABLE: ORDERS)
+ALTER TABLE ORDERS ADD CONSTRAINT ORDERS_CUSTOMERS
+    FOREIGN KEY (CUSTOMER_ID)
+        REFERENCES CUSTOMERS (CUSTOMER_ID);
 
--- Reference: Orders_Customers (table: Orders)
-ALTER TABLE Orders ADD CONSTRAINT Orders_Customers
-    FOREIGN KEY (CustomerID)
-    REFERENCES Customers (CustomerID);
+-- REFERENCE: PAYMENTS_ORDERS (TABLE: PAYMENTS)
+ALTER TABLE PAYMENTS ADD CONSTRAINT PAYMENTS_ORDERS
+    FOREIGN KEY (ORDER_ID)
+        REFERENCES ORDERS (ORDER_ID);
 
--- Reference: Payments_Orders (table: Payments)
-ALTER TABLE Payments ADD CONSTRAINT Payments_Orders
-    FOREIGN KEY (OrderID)
-    REFERENCES Orders (OrderID);
+-- REFERENCE: PRODUCTS_ACCESSORIES_DETAILS (TABLE: ACCESSORIES_DETAILS)
+ALTER TABLE ACCESSORIES_DETAILS ADD CONSTRAINT PRODUCTS_ACCESSORIES_DETAILS
+    FOREIGN KEY (ACCESSORY_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
 
--- Reference: Products_AccessoriesDetails (table: AccessoriesDetails)
-ALTER TABLE AccessoriesDetails ADD CONSTRAINT Products_AccessoriesDetails
-    FOREIGN KEY (AccessoryID)
-    REFERENCES Products (ProductID);
+-- REFERENCE: PRODUCTS_BOOK_DETAILS (TABLE: BOOK_DETAILS)
+ALTER TABLE BOOK_DETAILS ADD CONSTRAINT PRODUCTS_BOOK_DETAILS
+    FOREIGN KEY (BOOK_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
 
--- Reference: Products_BookDetails (table: BookDetails)
-ALTER TABLE BookDetails ADD CONSTRAINT Products_BookDetails
-    FOREIGN KEY (BookID)
-    REFERENCES Products (ProductID);
+-- REFERENCE: PRODUCTS_CATEGORIES (TABLE: PRODUCTS)
+ALTER TABLE PRODUCTS ADD CONSTRAINT PRODUCTS_CATEGORIES
+    FOREIGN KEY (CATEGORY_ID)
+        REFERENCES CATEGORIES (CATEGORY_ID);
 
--- Reference: Products_Categories (table: Products)
-ALTER TABLE Products ADD CONSTRAINT Products_Categories
-    FOREIGN KEY (CategoryID)
-    REFERENCES Categories (CategoryID);
+-- REFERENCE: PRODUCTS_GAME_DETAILS (TABLE: GAME_DETAILS)
+ALTER TABLE GAME_DETAILS ADD CONSTRAINT PRODUCTS_GAME_DETAILS
+    FOREIGN KEY (GAME_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
 
--- Reference: Products_GameDetails (table: GameDetails)
-ALTER TABLE GameDetails ADD CONSTRAINT Products_GameDetails
-    FOREIGN KEY (GameID)
-    REFERENCES Products (ProductID);
+-- REFERENCE: PRODUCTS_ORDER_DETAILS (TABLE: ORDER_DETAILS)
+ALTER TABLE ORDER_DETAILS ADD CONSTRAINT PRODUCTS_ORDER_DETAILS
+    FOREIGN KEY (PRODUCT_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
 
--- Reference: Products_OrderDetails (table: OrderDetails)
-ALTER TABLE OrderDetails ADD CONSTRAINT Products_OrderDetails
-    FOREIGN KEY (ProductID)
-    REFERENCES Products (ProductID);
+-- REFERENCE: SHIPPERS_ORDERS (TABLE: ORDERS)
+ALTER TABLE ORDERS ADD CONSTRAINT SHIPPERS_ORDERS
+    FOREIGN KEY (SHIP_VIA)
+        REFERENCES SHIPPERS (SHIPPER_ID);
 
--- Reference: Shippers_Orders (table: Orders)
-ALTER TABLE Orders ADD CONSTRAINT Shippers_Orders
-    FOREIGN KEY (ShipVia)
-    REFERENCES Shippers (ShipperID);
 
--- End of file.
+--------------------------------------------
+
+
+
+CREATE SEQUENCE PRODUCT_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE AUTHOR_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE CATEGORY_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE CUSTOMER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE ORDER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE PAYMENT_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE PUBLISHER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE SHIPPER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
 

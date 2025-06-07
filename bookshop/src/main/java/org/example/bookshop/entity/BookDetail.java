@@ -5,37 +5,37 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "BookDetails")
+@Table(name = "BOOK_DETAILS")
 public class BookDetail {
     @Id
-    @Column(name = "BookID")
+    @Column(name = "BOOK_ID")
     private Long bookID;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "BookID")
+    @JoinColumn(name = "BOOK_ID")
     private Product product;
 
     @Column(name = "ISBN")
     private String isbn;
 
-    @Column(name = "PublicationYear")
+    @Column(name = "PUBLICATION_YEAR")
     private Integer publicationYear;
 
-    @Column(name = "Language")
+    @Column(name = "LANGUAGE")
     private String language;
 
-    @Column(name = "PageCount")
+    @Column(name = "PAGE_COUNT")
     private Integer pageCount;
 
-    @Column(name = "Description")
+    @Column(name = "DESCRIPTION")
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "PublisherID")
+    @JoinColumn(name = "PUBLISHER_ID")
     private Publisher publisher;
 
     @ManyToMany
-    @JoinTable(name = "BookAuthors", joinColumns = @JoinColumn(name = "BookID"), inverseJoinColumns = @JoinColumn(name = "AuthorID"))
+    @JoinTable(name = "BOOK_AUTHORS", joinColumns = @JoinColumn(name = "BOOK_ID"), inverseJoinColumns = @JoinColumn(name = "AUTHOR_ID"))
     private List<Author> authors;
 }

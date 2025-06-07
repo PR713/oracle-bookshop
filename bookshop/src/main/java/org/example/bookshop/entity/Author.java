@@ -5,21 +5,21 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "Authors")
+@Table(name = "AUTHORS")
 public class Author {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
-    @SequenceGenerator(name = "product_seq", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
-    @Column(name = "AuthorID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "author_seq")
+    @SequenceGenerator(name = "author_seq", sequenceName = "AUTHOR_SEQ", allocationSize = 1)
+    @Column(name = "AUTHOR_ID")
     private Long authorID;
 
-    @Column(name = "FirstName")
+    @Column(name = "FIRST_NAME")
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "LAST_NAME")
     private String lastName;
 
-    @Column(name = "Biography")
+    @Column(name = "BIOGRAPHY")
     private String biography;
 
     @ManyToMany(mappedBy = "authors")

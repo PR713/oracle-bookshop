@@ -5,9 +5,9 @@ import java.io.Serializable;
 
 @Embeddable
 public class OrderDetailId implements Serializable {
-    @Column(name = "OrderID")
+    @Column(name = "ORDER_ID")
     private Long orderID;
 
-    @Column(name = "ProductID")
+    @Column(name = "PRODUCT_ID")
     private Long productID;
 }

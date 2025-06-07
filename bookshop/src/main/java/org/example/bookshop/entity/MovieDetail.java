@@ -3,31 +3,32 @@ package org.example.bookshop.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "MovieDetails")
+@Table(name = "MOVIE_DETAILS")
 public class MovieDetail {
     @Id
-    @Column(name = "MovieID")
+    @Column(name = "MOVIE_ID")
     private Long movieID;
 
     @OneToOne
-    @JoinColumn(name = "MovieID")
+    @MapsId
+    @JoinColumn(name = "MOVIE_ID")
     private Product product;
 
-    @Column(name = "Director")
+    @Column(name = "DIRECTOR")
     private String director;
 
-    @Column(name = "DurationInMinutes")
+    @Column(name = "DURATION_IN_MINUTES")
     private Integer durationInMinutes;
 
-    @Column(name = "ReleaseYear")
+    @Column(name = "RELEASE_YEAR")
     private Integer releaseYear;
 
-    @Column(name = "Language")
+    @Column(name = "LANGUAGE")
     private String language;
 
-    @Column(name = "Genre")
+    @Column(name = "GENRE")
     private String genre;
 
-    @Column(name = "Description")
+    @Column(name = "DESCRIPTION")
     private String description;
 }

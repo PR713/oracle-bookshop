@@ -50,8 +50,7 @@ public class Order {
         this.customer = customer;
     }
 
-
-    public void setProduct(Product product) {
-        //TODO Products są w OrderDetails (?)
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }

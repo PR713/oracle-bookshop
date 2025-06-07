@@ -39,4 +39,12 @@ public class Product {
     public Integer getStock() {return stock;}
 
     public void setStock(Integer stock) {this.stock = stock;}
+
+    public String getName() {
+        return name;
+    }
+
+    public Float getPrice() {
+        return price;
+    }
 }

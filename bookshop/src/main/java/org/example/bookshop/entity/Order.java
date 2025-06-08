@@ -1,6 +1,9 @@
 package org.example.bookshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -52,5 +55,28 @@ public class Order {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public void setShipVia(Shipper shipper) {
+        this.shipVia = shipper;
+    }
+
+    public Shipper getShipVia() {
+        return this.shipVia;
+    }
+
+
+    public @NotNull(message = "Order date is required") LocalDate getOrderDate() {
+        return this.orderDate;
+    }
+
+    public Customer getCustomer() {
+        return this.customer;
+    }
+
+
+    public @NotBlank(message = "Order status is required") @Pattern(regexp = "NEW|CANCELLED|COMPLETED|PROCESSING",
+            message = "Order status must be NEW, CANCELLED, COMPLETED, or PROCESSING") String getOrderStatus() {
+        return this.orderStatus;
     }
 }

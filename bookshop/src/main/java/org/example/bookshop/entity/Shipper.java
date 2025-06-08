@@ -1,6 +1,8 @@
 package org.example.bookshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 @Entity
@@ -20,4 +22,8 @@ public class Shipper {
 
     @OneToMany(mappedBy = "shipVia")
     private List<Order> orders;
+
+    public @NotNull(message = "Shipper ID is required") Long getShipperID() {
+        return shipperID;
+    }
 }

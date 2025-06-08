@@ -1,6 +1,7 @@
 package org.example.bookshop.service;
 
 import jakarta.transaction.Transactional;
+import org.example.bookshop.dto.PurchaseRequestDTO;
 import org.example.bookshop.entity.*;
 import org.example.bookshop.repository.*;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ public class PurchaseService {
                            CustomerRepository customerRepository,
                            OrderRepository orderRepository,
                            PaymentRepository paymentRepository,
-                           OrderDetailRepository orderDetailRepository, OrderService orderService) {
+                           OrderDetailRepository orderDetailRepository,
+                           OrderService orderService) {
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.orderRepository = orderRepository;
@@ -33,25 +35,29 @@ public class PurchaseService {
     }
 
     @Transactional
+    public void purchaseProducts(PurchaseRequestDTO purchaseRequest) {
+        purchaseProducts(purchaseRequest.getCustomerId(), purchaseRequest.getProductQuantities());
+    }
+
+    @Transactional
     public void purchaseProducts(Long customerId, Map<Long, Integer> productQuantities) {
         Map<Product, Integer> productsToOrder = new HashMap<>();
 
         for (Map.Entry<Long, Integer> entry : productQuantities.entrySet()) {
             Product product = productRepository.findProductForUpdate(entry.getKey())
-                    .orElseThrow(() -> new RuntimeException("Product not found" + entry.getKey()));
+                    .orElseThrow(() -> new RuntimeException("Product not found: " + entry.getKey()));
 
             if (product.getStock() < entry.getValue()) {
-                throw new RuntimeException("Product has no enough stock" + product.getName());
+                throw new RuntimeException("Product has not enough stock: " + product.getName());
             }
 
             productsToOrder.put(product, entry.getValue());
         }
 
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found" + customerId));
+                .orElseThrow(() -> new RuntimeException("Customer not found: " + customerId));
 
         Order order = new Order();
-
         order.setCustomer(customer);
         order.setOrderDate(LocalDate.now());
         order.setOrderStatus("NEW");
@@ -71,12 +77,10 @@ public class PurchaseService {
             orderDetailRepository.save(orderDetail);
         }
 
-
         Payment payment = new Payment();
         payment.setPaymentDate(LocalDate.now());
         payment.setOrder(order);
         payment.setPaymentStatus("NEW");
         paymentRepository.save(payment);
     }
-
 }

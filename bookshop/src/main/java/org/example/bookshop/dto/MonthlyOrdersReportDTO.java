@@ -3,25 +3,25 @@ package org.example.bookshop.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class MonthlySalesReportDTO {
+public class MonthlyOrdersReportDTO {
     private int year;
     private int month;
     private Long totalOrders;
     private BigDecimal totalRevenue;
     private Long uniqueCustomers;
     private BigDecimal averageOrderValue;
-    private List<ProductMonthlySalesDTO> productSales;
+    private List<MonthlyOrderDTO> orders;
 
-    public MonthlySalesReportDTO(int year, int month, Long totalOrders, BigDecimal totalRevenue,
-                                 Long uniqueCustomers, BigDecimal averageOrderValue,
-                                 List<ProductMonthlySalesDTO> productSales) {
+    public MonthlyOrdersReportDTO(int year, int month, Long totalOrders,
+                                  BigDecimal totalRevenue, Long uniqueCustomers,
+                                  BigDecimal averageOrderValue, List<MonthlyOrderDTO> orders) {
         this.year = year;
         this.month = month;
         this.totalOrders = totalOrders;
         this.totalRevenue = totalRevenue;
         this.uniqueCustomers = uniqueCustomers;
         this.averageOrderValue = averageOrderValue;
-        this.productSales = productSales;
+        this.orders = orders;
     }
 
     public int getYear() { return year; }
@@ -42,6 +42,6 @@ public class MonthlySalesReportDTO {
     public BigDecimal getAverageOrderValue() { return averageOrderValue; }
     public void setAverageOrderValue(BigDecimal averageOrderValue) { this.averageOrderValue = averageOrderValue; }
 
-    public List<ProductMonthlySalesDTO> getProductSales() { return productSales; }
-    public void setProductSales(List<ProductMonthlySalesDTO> productSales) { this.productSales = productSales; }
+    public List<MonthlyOrderDTO> getOrders() { return orders; }
+    public void setOrders(List<MonthlyOrderDTO> orders) { this.orders = orders; }
 }

@@ -4,195 +4,185 @@ import org.example.bookshop.dto.*;
 import org.example.bookshop.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @Transactional(readOnly = true)
 public class ReportingService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportingService.class);
 
     @PersistenceContext
     private EntityManager entityManager;
 
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
-    private final CustomerRepository customerRepository;
-    private final PaymentRepository paymentRepository;
 
     public ReportingService(ProductRepository productRepository,
-                            OrderRepository orderRepository,
-                            CustomerRepository customerRepository,
-                            PaymentRepository paymentRepository) {
+                            OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
-        this.customerRepository = customerRepository;
-        this.paymentRepository = paymentRepository;
-    }
-
-    /**
-     * Top 10 najlepiej sprzedających się produktów
-     */
-    public List<ProductSalesReportDTO> getTopSellingProducts() {
-        String jpql = """
-            SELECT new org.example.bookshop.dto.ProductSalesReportDTO(
-                p.productID,
-                p.name,
-                p.price,
-                SUM(od.quantity),
-                SUM(od.quantity * od.unitPrice),
-                COUNT(DISTINCT o.orderID)
-            )
-            FROM OrderDetail od
-            JOIN od.product p
-            JOIN od.order o
-            WHERE o.orderStatus = 'COMPLETED'
-            GROUP BY p.productId, p.name, p.price
-            ORDER BY SUM(od.quantity) DESC
-            """;
-
-        return entityManager.createQuery(jpql, ProductSalesReportDTO.class)
-                .setMaxResults(10)
-                .getResultList();
-    }
-
-    /**
-     * Statystyki sprzedaży za bieżący miesiąc
-     */
-    public MonthlySalesReportDTO getCurrentMonthSales() {
-        LocalDateTime now = LocalDateTime.now();
-        int year = now.getYear();
-        int month = now.getMonthValue();
-
-        String mainStatsJpql = """
-            SELECT
-                COUNT(DISTINCT o.orderID) as totalOrders,
-                COALESCE(SUM(p.amount), 0) as totalRevenue,
-                COUNT(DISTINCT o.customer.customerID) as uniqueCustomers,
-                COALESCE(AVG(p.amount), 0) as averageOrderValue
-            FROM Order o
-            JOIN Payment p ON p.order.orderID = o.orderID
-            WHERE YEAR(o.orderDate) = :year
-            AND MONTH(o.orderDate) = :month
-            AND o.orderStatus = 'COMPLETED'
-            """;
-
-        Object[] mainStats = (Object[]) entityManager.createQuery(mainStatsJpql)
-                .setParameter("year", year)
-                .setParameter("month", month)
-                .getSingleResult();
-
-        String productSalesJpql = """
-            SELECT new org.example.bookshop.dto.ProductMonthlySalesDTO(
-                p.productID,
-                p.name,
-                SUM(od.quantity),
-                SUM(od.quantity * od.unitPrice)
-            )
-            FROM OrderDetail od
-            JOIN od.product p
-            JOIN od.order o
-            WHERE YEAR(o.orderDate) = :year
-            AND MONTH(o.orderDate) = :month
-            AND o.orderStatus = 'COMPLETED'
-            GROUP BY p.productID, p.name
-            ORDER BY SUM(od.quantity * od.unitPrice) DESC
-            """;
-
-        List<ProductMonthlySalesDTO> productSales = entityManager
-                .createQuery(productSalesJpql, ProductMonthlySalesDTO.class)
-                .setParameter("year", year)
-                .setParameter("month", month)
-                .getResultList();
-
-        return new MonthlySalesReportDTO(
-                year,
-                month,
-                ((Number) mainStats[0]).longValue(),
-                (BigDecimal) mainStats[1],
-                ((Number) mainStats[2]).longValue(),
-                (BigDecimal) mainStats[3],
-                productSales
-        );
     }
 
     /**
      * Produkty z niskim stanem magazynowym (poniżej 10 sztuk)
      */
     public List<LowStockReportDTO> getLowStockProducts() {
-        String jpql = """
-            SELECT new org.example.bookshop.dto.LowStockReportDTO(
-                p.productID,
-                p.name,
-                p.stock,
-                p.price,
-                cat.categoryName,
-                COALESCE(SUM(od.quantity), 0)
-            )
-            FROM Product p
-            LEFT JOIN Category cat ON p.category.categoryID = cat.categoryID
-            LEFT JOIN OrderDetail od ON p.productID = od.product.productID
-            LEFT JOIN Order o ON od.order.orderID = o.orderID
-                AND o.orderDate >= :lastMonth
-                AND o.orderStatus = 'COMPLETED'
-            WHERE p.stock <= 10
-            GROUP BY p.productID, p.name, p.stock, p.price, cat.categoryName
-            ORDER BY p.stock ASC
-            """;
+        log.info("Generating low stock products report");
 
-        LocalDateTime lastMonth = LocalDateTime.now().minusMonths(1);
+        try {
+            String productJpql = """
+                SELECT p.productId, p.name, p.stock, p.price, c.categoryName
+                FROM Product p
+                LEFT JOIN p.category c
+                WHERE p.stock <= 10
+                ORDER BY p.stock ASC
+                """;
 
-        return entityManager.createQuery(jpql, LowStockReportDTO.class)
-                .setParameter("lastMonth", lastMonth)
-                .getResultList();
+            List<Object[]> productResults = entityManager.createQuery(productJpql, Object[].class)
+                    .getResultList();
+
+            List<LowStockReportDTO> reports = new ArrayList<>();
+            LocalDateTime lastMonth = LocalDateTime.now().minusMonths(1);
+
+            for (Object[] row : productResults) {
+                Long productId = (Long) row[0];
+                String productName = (String) row[1];
+                Integer stockQuantity = (Integer) row[2];
+                BigDecimal price = (BigDecimal) row[3];
+                String categoryName = row[4] != null ? (String) row[4] : "Bez kategorii";
+
+                String salesJpql = """
+                    SELECT COALESCE(SUM(od.quantity), 0)
+                    FROM OrderDetail od
+                    JOIN od.order o
+                    WHERE od.product.productId = :productId
+                    AND o.orderDate >= :lastMonth
+                    AND o.orderStatus = 'COMPLETED'
+                    """;
+
+                Long recentSales = entityManager.createQuery(salesJpql, Long.class)
+                        .setParameter("productId", productId)
+                        .setParameter("lastMonth", lastMonth)
+                        .getSingleResult();
+
+                reports.add(new LowStockReportDTO(
+                        productId, productName, stockQuantity, price, categoryName, recentSales
+                ));
+            }
+
+            log.info("Low stock report generated successfully with {} products", reports.size());
+            return reports;
+
+        } catch (Exception e) {
+            log.error("Error generating low stock products report", e);
+            throw new RuntimeException("Failed to generate low stock report", e);
+        }
     }
 
     /**
-     * Dashboard z kluczowymi metrykami
+     * Miesięczny raport zamówień za bieżący miesiąc
      */
-    public DashboardDTO getDashboardStats() {
-        // Dzisiejsze statystyki
-        String todayStatsJpql = """
-            SELECT
-                COUNT(o.orderID),
-                COALESCE(SUM(p.amount), 0)
-            FROM Order o
-            LEFT JOIN Payment p ON o.orderID = p.order.orderID
-            WHERE DATE(o.orderDate) = CURRENT_DATE
-            AND o.orderStatus = 'COMPLETED'
-            """;
+    public MonthlyOrdersReportDTO getCurrentMonthOrdersReport() {
+        LocalDateTime now = LocalDateTime.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
 
-        Object[] todayStats = (Object[]) entityManager.createQuery(todayStatsJpql)
-                .getSingleResult();
+        log.info("Generating monthly orders report for {}/{}", month, year);
 
-        // Ostatnie zamówienia
-        String recentOrdersJpql = """
-            SELECT new org.example.bookshop.dto.RecentOrderDTO(
-                o.orderID,
-                c.customerName,
-                o.orderDate,
-                p.amount,
-                o.orderStatus
-            )
-            FROM Order o
-            JOIN Customer c ON o.customer.customerID = c.customerID
-            LEFT JOIN Payment p ON o.orderID = p.order.orderID
-            ORDER BY o.orderDate DESC
-            """;
+        try {
+            String ordersJpql = """
+                SELECT o.orderID, 
+                       CONCAT(c.firstName, ' ', c.lastName), 
+                       o.orderDate, 
+                       o.orderStatus
+                FROM Order o
+                JOIN o.customer c
+                WHERE EXTRACT(YEAR FROM o.orderDate) = :year
+                AND EXTRACT(MONTH FROM o.orderDate) = :month
+                ORDER BY o.orderDate DESC
+                """;
 
-        List<RecentOrderDTO> recentOrders = entityManager
-                .createQuery(recentOrdersJpql, RecentOrderDTO.class)
-                .setMaxResults(5)
-                .getResultList();
+            List<Object[]> orderResults = entityManager.createQuery(ordersJpql, Object[].class)
+                    .setParameter("year", year)
+                    .setParameter("month", month)
+                    .getResultList();
 
-        return new DashboardDTO(
-                ((Number) todayStats[0]).longValue(),
-                (BigDecimal) todayStats[1],
-                getLowStockProducts(),
-                recentOrders
-        );
+            List<MonthlyOrderDTO> orders = new ArrayList<>();
+            BigDecimal totalRevenue = BigDecimal.ZERO;
+            Long completedOrders = 0L;
+            Long uniqueCustomers = 0L;
+
+            for (Object[] row : orderResults) {
+                Long orderId = (Long) row[0];
+                String customerName = (String) row[1];
+                LocalDateTime orderDate = (LocalDateTime) row[2];
+                String orderStatus = (String) row[3];
+
+                String orderValueJpql = """
+                    SELECT COALESCE(SUM(od.quantity * od.unitPrice), 0)
+                    FROM OrderDetail od
+                    WHERE od.order.orderID = :orderId
+                    """;
+
+                BigDecimal orderValue = entityManager.createQuery(orderValueJpql, BigDecimal.class)
+                        .setParameter("orderId", orderId)
+                        .getSingleResult();
+
+                orders.add(new MonthlyOrderDTO(orderId, customerName, orderDate, orderValue, orderStatus));
+
+                if ("COMPLETED".equals(orderStatus)) {
+                    totalRevenue = totalRevenue.add(orderValue);
+                    completedOrders++;
+                }
+            }
+
+            String uniqueCustomersJpql = """
+                SELECT COUNT(DISTINCT o.customer.customerID)
+                FROM Order o
+                WHERE EXTRACT(YEAR FROM o.orderDate) = :year
+                AND EXTRACT(MONTH FROM o.orderDate) = :month
+                AND o.orderStatus = 'COMPLETED'
+                """;
+
+            uniqueCustomers = entityManager.createQuery(uniqueCustomersJpql, Long.class)
+                    .setParameter("year", year)
+                    .setParameter("month", month)
+                    .getSingleResult();
+
+            BigDecimal averageOrderValue = BigDecimal.ZERO;
+            if (completedOrders > 0) {
+                averageOrderValue = totalRevenue.divide(
+                        BigDecimal.valueOf(completedOrders), 2, RoundingMode.HALF_UP
+                );
+            }
+
+            MonthlyOrdersReportDTO report = new MonthlyOrdersReportDTO(
+                    year,
+                    month,
+                    (long) orders.size(),
+                    totalRevenue,
+                    uniqueCustomers,
+                    averageOrderValue,
+                    orders
+            );
+
+            log.info("Monthly report generated successfully: {} orders, revenue: {}",
+                    orders.size(), totalRevenue);
+            return report;
+
+        } catch (Exception e) {
+            log.error("Error generating monthly orders report for {}/{}", month, year, e);
+            throw new RuntimeException("Failed to generate monthly orders report", e);
+        }
     }
 }

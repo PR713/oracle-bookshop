@@ -5,20 +5,21 @@ import java.math.BigDecimal;
 public class LowStockReportDTO {
     private Long productId;
     private String productName;
-    private Integer currentStock;
-    private Double price;
+    private Integer stockQuantity;
+    private BigDecimal price;
     private String categoryName;
     private Long recentSales;
 
-    public LowStockReportDTO(Long productId, String productName, Integer currentStock,
-                             Double price, String categoryName, Long recentSales) {
+    public LowStockReportDTO(Long productId, String productName, Integer stockQuantity,
+                             BigDecimal price, String categoryName, Long recentSales) {
         this.productId = productId;
         this.productName = productName;
-        this.currentStock = currentStock;
+        this.stockQuantity = stockQuantity;
         this.price = price;
         this.categoryName = categoryName;
         this.recentSales = recentSales;
     }
+
 
     public Long getProductId() { return productId; }
     public void setProductId(Long productId) { this.productId = productId; }
@@ -26,11 +27,11 @@ public class LowStockReportDTO {
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
 
-    public Integer getCurrentStock() { return currentStock; }
-    public void setCurrentStock(Integer currentStock) { this.currentStock = currentStock; }
+    public Integer getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
     public String getCategoryName() { return categoryName; }
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }

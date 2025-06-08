@@ -209,7 +209,6 @@ public class PurchaseService {
             throw new RuntimeException("Only NEW orders can have payment retried");
         }
 
-        // Znajdź nieudaną płatność
         List<PaymentDTO> payments = paymentService.findByOrderId(orderId);
         PaymentDTO failedPayment = payments.stream()
                 .filter(p -> "FAILED".equals(p.getPaymentStatus()))

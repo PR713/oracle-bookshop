@@ -2,6 +2,8 @@ package org.example.bookshop.service;
 
 import org.example.bookshop.dto.PurchaseRequestDTO;
 import org.example.bookshop.dto.PurchaseItemDTO;
+import org.example.bookshop.dto.OrderDTO;
+import org.example.bookshop.dto.PaymentDTO;
 import org.example.bookshop.entity.*;
 import org.example.bookshop.repository.*;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import jakarta.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PurchaseService {
@@ -21,77 +24,206 @@ public class PurchaseService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     private final CustomerRepository customerRepository;
-    private final OrderRepository orderRepository;
-    private final PaymentRepository paymentRepository;
+    private final OrderService orderService;
+    private final PaymentService paymentService;
     private final OrderDetailRepository orderDetailRepository;
+    private final ShipperRepository shipperRepository;
 
-    public PurchaseService(ProductRepository productRepository,
+    public PurchaseService(ProductService productService,
                            CustomerRepository customerRepository,
-                           OrderRepository orderRepository,
-                           PaymentRepository paymentRepository,
-                           OrderDetailRepository orderDetailRepository) {
-        this.productRepository = productRepository;
+                           OrderService orderService,
+                           PaymentService paymentService,
+                           OrderDetailRepository orderDetailRepository,
+                           ShipperRepository shipperRepository) {
+        this.productService = productService;
         this.customerRepository = customerRepository;
-        this.orderRepository = orderRepository;
-        this.paymentRepository = paymentRepository;
+        this.orderService = orderService;
+        this.paymentService = paymentService;
         this.orderDetailRepository = orderDetailRepository;
+        this.shipperRepository = shipperRepository;
     }
 
     /**
-     * Główna metoda zakupu z pessimistic locking
+     * pessimistic locking - transakcja zakupu z kontrolą równoczesnego dostępu
      */
     @Transactional(rollbackFor = Exception.class)
     public Order purchaseProducts(PurchaseRequestDTO request) {
-
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + request.getCustomerId()));
 
-        Order order = new Order();
-        order.setCustomer(customer);
-        order.setOrderDate(LocalDate.from(LocalDateTime.now()));
-        order.setOrderStatus("PROCESSING");
-        order = orderRepository.save(order);
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setCustomerId(customer.getCustomerID());
+        orderDTO.setOrderDate(LocalDate.from(LocalDateTime.now()));
+        orderDTO.setOrderStatus("NEW");
+
+        OrderDTO savedOrderDTO = orderService.save(orderDTO);
+        Order order = orderService.convertToEntity(orderDTO);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (PurchaseItemDTO item : request.getItems()) {
-            // PESSIMISTIC LOCK - blokujemy rekord w bazie danych
-            Product product = entityManager.find(Product.class, item.getProductId(), LockModeType.PESSIMISTIC_WRITE);
+        try {
+            for (PurchaseItemDTO item : request.getItems()) {
+                // PESSIMISTIC LOCK - blokujemy rekord w bazie danych dla race condition
+                Product product = entityManager.find(Product.class, item.getProductId(), LockModeType.PESSIMISTIC_WRITE);
 
-            if (product == null) {
-                throw new RuntimeException("Product not found: " + item.getProductId());
+                if (product == null) {
+                    throw new RuntimeException("Product not found: " + item.getProductId());
+                }
+
+                if (product.getStock() < item.getQuantity()) {
+                    throw new RuntimeException(
+                            String.format("Insufficient stock for product %s. Available: %d, Requested: %d",
+                                    product.getName(), product.getStock(), item.getQuantity()));
+                }
+
+                product.setStock(product.getStock() - item.getQuantity());
+                productService.save(product);
+
+                OrderDetail orderDetail = new OrderDetail();
+                orderDetail.setOrder(order);
+                orderDetail.setProduct(product);
+                orderDetail.setQuantity(item.getQuantity());
+                orderDetail.setUnitPrice(product.getPrice());
+                orderDetailRepository.save(orderDetail);
+
+                totalAmount = totalAmount.add(
+                        BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(item.getQuantity()))
+                );
             }
 
-            if (product.getStock() < item.getQuantity()) {
-                throw new RuntimeException(
-                        String.format("Insufficient stock for product %s. Available: %d, Requested: %d",
-                                product.getName(), product.getStock(), item.getQuantity()));
-            }
 
-            product.setStock(product.getStock() - item.getQuantity());
-            productRepository.save(product);
+            PaymentDTO paymentDTO = new PaymentDTO();
+            paymentDTO.setOrderId(order.getOrderID());
+            paymentDTO.setPaymentDate(LocalDate.from(LocalDateTime.now()));
+            paymentDTO.setPaymentStatus("NEW");
+            paymentService.save(paymentDTO);
 
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrder(order);
-            orderDetail.setProduct(product);
-            orderDetail.setQuantity(item.getQuantity());
-            orderDetail.setUnitPrice(product.getPrice());
-            orderDetailRepository.save(orderDetail);
-
-            totalAmount = totalAmount.add(
-                    BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(item.getQuantity()))
-            );
+        } catch (Exception e) {
+            orderDTO.setOrderStatus("CANCELLED");
+            orderService.save(orderDTO);
+            throw e;
         }
 
-        Payment payment = new Payment();
-        payment.setOrder(order);
-        payment.setPaymentDate(LocalDate.from(LocalDateTime.now()));
-        payment.setPaymentStatus("COMPLETED");
-        paymentRepository.save(payment);
+        return order;
+    }
 
-        order.setOrderStatus("COMPLETED");
-        return orderRepository.save(order);
+
+    @Transactional(rollbackFor = Exception.class)
+    public OrderDTO processPayment(Long orderId) {
+        OrderDTO orderDTO = orderService.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+
+        if (!"NEW".equals(orderDTO.getOrderStatus())) {
+            throw new RuntimeException("Only NEW orders can be paid");
+        }
+
+        List<PaymentDTO> payments = paymentService.findByOrderId(orderId);
+
+        PaymentDTO payment = payments.stream()
+                .filter(p -> "NEW".equals(p.getPaymentStatus()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No pending payment found"));
+
+
+        boolean paymentSuccessful = processPaymentSimulation();
+
+        if (paymentSuccessful) {
+            payment.setPaymentStatus("PAID");
+            paymentService.save(payment);
+
+            orderDTO.setOrderStatus("PROCESSING");
+            return orderService.save(orderDTO);
+        } else {
+            payment.setPaymentStatus("FAILED");
+            paymentService.save(payment);
+            throw new RuntimeException("Payment failed");
+        }
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public OrderDTO startShipping(Long orderId, Long shipperId) {
+        OrderDTO orderDTO = orderService.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        if (!"PROCESSING".equals(orderDTO.getOrderStatus())) {
+            throw new RuntimeException("Only PROCESSING orders can be shipped");
+        }
+
+        shipperRepository.findById(shipperId)
+                .orElseThrow(() -> new RuntimeException("Shipper not found: " + shipperId));
+
+        orderDTO.setShipVia(shipperId);
+        return orderService.save(orderDTO);
+
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public OrderDTO completeOrder(Long orderId) {
+        OrderDTO orderDTO = orderService.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        if (!"PROCESSING".equals(orderDTO.getOrderStatus())) {
+            throw new RuntimeException("Only PROCESSING orders can be completed");
+        }
+
+        orderDTO.setOrderStatus("COMPLETED");
+        return orderService.save(orderDTO);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrder(Long orderId) {
+        OrderDTO orderDTO = orderService.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        if ("COMPLETED".equals(orderDTO.getOrderStatus())) {
+            throw new RuntimeException("Completed orders cannot be cancelled");
+        }
+
+        // Przywrócenie stanu magazynowego
+        Order order = entityManager.find(Order.class, orderId);
+        if (order != null && order.getOrderDetails() != null) {
+            for (OrderDetail detail : order.getOrderDetails()) {
+                Product product = entityManager.find(Product.class,
+                        detail.getProduct().getProductID(), LockModeType.PESSIMISTIC_WRITE);
+                product.setStock(product.getStock() + detail.getQuantity());
+                productService.save(product);
+            }
+        }
+
+        orderDTO.setOrderStatus("CANCELLED");
+        orderService.save(orderDTO);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public OrderDTO retryPayment(Long orderId) {
+        OrderDTO orderDTO = orderService.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        if (!"NEW".equals(orderDTO.getOrderStatus())) {
+            throw new RuntimeException("Only NEW orders can have payment retried");
+        }
+
+        // Znajdź nieudaną płatność
+        List<PaymentDTO> payments = paymentService.findByOrderId(orderId);
+        PaymentDTO failedPayment = payments.stream()
+                .filter(p -> "FAILED".equals(p.getPaymentStatus()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No failed payment found"));
+
+        failedPayment.setPaymentStatus("NEW");
+        paymentService.save(failedPayment);
+
+        return processPayment(orderId);
+    }
+
+
+    private boolean processPaymentSimulation() {
+        return Math.random() > 0.15;
     }
 }

@@ -65,4 +65,11 @@ public class PaymentService {
         payment.setPaymentStatus(dto.getPaymentStatus());
         return payment;
     }
+
+    public List<PaymentDTO> findByOrderId(Long orderId) {
+        return paymentRepository.findAll().stream()
+                .filter(p -> p.getOrder().getOrderID().equals(orderId))
+                .map(this::convertToDTO)
+                .toList();
+    }
 }

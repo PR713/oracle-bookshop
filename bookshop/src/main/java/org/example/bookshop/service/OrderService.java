@@ -64,7 +64,7 @@ public class OrderService {
         return dto;
     }
 
-    private Order convertToEntity(OrderDTO dto) {
+    Order convertToEntity(OrderDTO dto) {
         Order order = new Order();
         if (dto.getOrderId() != null) {
             order.setOrderID(dto.getOrderId());

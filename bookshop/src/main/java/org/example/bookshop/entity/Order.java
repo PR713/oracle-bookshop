@@ -79,4 +79,8 @@ public class Order {
             message = "Order status must be NEW, CANCELLED, COMPLETED, or PROCESSING") String getOrderStatus() {
         return this.orderStatus;
     }
+
+    public List<OrderDetail> getOrderDetails() {
+        return this.orderDetails;
+    }
 }

@@ -1,6 +1,7 @@
 package org.example.bookshop.controller;
 
-import org.example.bookshop.entity.Payment;
+import jakarta.validation.Valid;
+import org.example.bookshop.dto.PaymentDTO;
 import org.example.bookshop.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,28 +18,34 @@ public class PaymentController {
     }
 
     @GetMapping
-    public List<Payment> getAllPayments() {
+    public List<PaymentDTO> getAllPayments() {
         return paymentService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
+    public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable Long id) {
         return paymentService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Payment createPayment(@RequestBody Payment payment) {
-        return paymentService.save(payment);
+    public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) {
+        try {
+            PaymentDTO savedPayment = paymentService.save(paymentDTO);
+            return ResponseEntity.ok(savedPayment);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Payment> updatePayment(@PathVariable Long id, @RequestBody Payment updatedPayment) {
+    public ResponseEntity<PaymentDTO> updatePayment(@PathVariable Long id, @Valid @RequestBody PaymentDTO paymentDTO) {
         return paymentService.findById(id)
-                .map(p -> {
-                    updatedPayment.setPaymentID(p.getPaymentID());
-                    return ResponseEntity.ok(paymentService.save(updatedPayment));
+                .map(existingPayment -> {
+                    paymentDTO.setPaymentId(id);
+                    PaymentDTO updatedPayment = paymentService.save(paymentDTO);
+                    return ResponseEntity.ok(updatedPayment);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

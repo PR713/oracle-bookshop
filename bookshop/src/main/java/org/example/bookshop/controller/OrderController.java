@@ -1,6 +1,7 @@
 package org.example.bookshop.controller;
 
-import org.example.bookshop.entity.Order;
+import jakarta.validation.Valid;
+import org.example.bookshop.dto.OrderDTO;
 import org.example.bookshop.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,28 +18,34 @@ public class OrderController {
     }
 
     @GetMapping
-    public List<Order> getAllOrders() {
+    public List<OrderDTO> getAllOrders() {
         return orderService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
         return orderService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.save(order);
+    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDTO) {
+        try {
+            OrderDTO savedOrder = orderService.save(orderDTO);
+            return ResponseEntity.ok(savedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order updatedOrder) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderDTO orderDTO) {
         return orderService.findById(id)
-                .map(o -> {
-                    updatedOrder.setOrderID(o.getOrderID());
-                    return ResponseEntity.ok(orderService.save(updatedOrder));
+                .map(existingOrder -> {
+                    orderDTO.setOrderId(id);
+                    OrderDTO updatedOrder = orderService.save(orderDTO);
+                    return ResponseEntity.ok(updatedOrder);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

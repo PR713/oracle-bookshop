@@ -1,6 +1,7 @@
 package org.example.bookshop.controller;
 
-import org.example.bookshop.entity.Product;
+import jakarta.validation.Valid;
+import org.example.bookshop.dto.ProductDTO;
 import org.example.bookshop.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,28 +18,34 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductDTO> getAllProducts() {
         return productService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         return productService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.save(product);
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
+        try {
+            ProductDTO savedProduct = productService.save(productDTO);
+            return ResponseEntity.ok(savedProduct);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id,
+                                                    @Valid @RequestBody ProductDTO productDTO) {
         return productService.findById(id)
-                .map(product -> {
-                    updatedProduct.setProductID(product.getProductID()); // zakładam pole: getProductID()
-                    return ResponseEntity.ok(productService.save(updatedProduct));
+                .map(existingProduct -> {
+                    ProductDTO updatedProduct = productService.save(productDTO);
+                    return ResponseEntity.ok(updatedProduct);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

@@ -1,6 +1,7 @@
 package org.example.bookshop.controller;
 
-import org.example.bookshop.entity.Customer;
+import jakarta.validation.Valid;
+import org.example.bookshop.dto.CustomerDTO;
 import org.example.bookshop.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,28 +18,34 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         return customerService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
         return customerService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerService.save(customer);
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
+        try {
+            CustomerDTO savedCustomer = customerService.save(customerDTO);
+            return ResponseEntity.ok(savedCustomer);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer updatedCustomer) {
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
         return customerService.findById(id)
-                .map(c -> {
-                    updatedCustomer.setCustomerID(c.getCustomerID());
-                    return ResponseEntity.ok(customerService.save(updatedCustomer));
+                .map(existingCustomer -> {
+                    customerDTO.setCustomerId(id);
+                    CustomerDTO updatedCustomer = customerService.save(customerDTO);
+                    return ResponseEntity.ok(updatedCustomer);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

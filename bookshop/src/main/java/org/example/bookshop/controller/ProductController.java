@@ -40,6 +40,7 @@ public class ProductController {
                                                     @Valid @RequestBody ProductDTO productDTO) {
         return productService.findById(id)
                 .map(existingProduct -> {
+                    productDTO.setProductId(id);
                     ProductDTO updatedProduct = productService.save(productDTO);
                     return ResponseEntity.ok(updatedProduct);
                 })

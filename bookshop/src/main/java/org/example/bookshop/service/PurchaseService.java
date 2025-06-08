@@ -92,6 +92,7 @@ public class PurchaseService {
                 orderDetail.setProduct(product);
                 orderDetail.setQuantity(item.getQuantity());
                 orderDetail.setUnitPrice(product.getPrice());
+                orderDetail.setDiscount(item.getDiscount());
                 orderDetailRepository.save(orderDetail);
 
                 totalAmount = totalAmount.add(

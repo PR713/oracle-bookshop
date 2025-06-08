@@ -154,6 +154,11 @@ public class ProductService {
 
     private Product convertToEntity(ProductDTO dto) {
         Product product = new Product();
+
+        if (dto.getProductId() != null) {
+            product.setProductID(dto.getProductId());
+        }
+
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());

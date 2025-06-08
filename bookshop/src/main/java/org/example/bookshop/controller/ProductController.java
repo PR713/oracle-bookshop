@@ -31,12 +31,8 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
-        try {
-            ProductDTO savedProduct = productService.save(productDTO);
-            return ResponseEntity.ok(savedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        ProductDTO savedProduct = productService.save(productDTO);
+        return ResponseEntity.ok(savedProduct);
     }
 
     @PutMapping("/{id}")

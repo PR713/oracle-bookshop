@@ -263,3 +263,5 @@ CREATE SEQUENCE SHIPPER_SEQ
     NOCYCLE;
 
 
+ALTER TABLE products
+    ADD CONSTRAINT chk_price_positive CHECK (price > 0);

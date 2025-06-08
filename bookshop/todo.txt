@@ -1,38 +1,4 @@
 operacje o charakterze raportującym (wykonanie złożonego zapytania - pobierającego
  dane z kilku encji/tabel/kolekcji, wykonującego operacje agregacji itp.)
 
-walidacje
-
 testy reszty endpointów
-
-
-
-POPRAWIĆ XD:
-{
-    "name": "Spring in Action",
-    "price": 99.99,
-    "stock": 10,
-    "rating": 5,
-    "category": {
-        "categoryID": 1,
-        "categoryName": "Books",
-        "products": [
-            {
-                "name": "Spring in Action",
-                "price": 99.99,
-                "stock": 10,
-                "rating": 5,
-                "category": {
-                    "categoryID": 1,
-                    "categoryName": "Books",
-                    "products": [
-                        {
-                            "name": "Spring in Action",
-                            "price": 99.99,
-                            "stock": 10,
-                            "rating": 5,
-                            "category": {
-                                "categoryID": 1,
-                                "categoryName": "Books",
-                                "products": [
-                                    ...XD

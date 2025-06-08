@@ -1,5 +1,6 @@
 package org.example.bookshop.entity;
 
+
 import jakarta.persistence.*;
 
 @Entity

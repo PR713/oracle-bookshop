@@ -34,7 +34,7 @@ public class MovieDetailController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping//to little fix 404
     public ResponseEntity<MovieDetailDTO> createMovie(@RequestBody MovieDetailDTO movieDetailDTO) {
         try {
             MovieDetailDTO savedMovie = movieDetailService.save(movieDetailDTO);

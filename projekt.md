@@ -1,18 +1,17 @@
 # Księgarnia internetowa
 
-
-**Autorzy:** Radosław Szepielak, Kacper Wdowiak 
-
-
+**Autorzy:** Radosław Szepielak, Kacper Wdowiak
 
 ## 1. Wybór technologii
 
 ### 1.1 Baza danych
+
 - **Typ:** Relacyjna
 - **Wybrany system:** Oracle Database
 - **Uzasadnienie wyboru:** Oracle to stabilna, wydajna i szeroko wykorzystywana baza danych. Posiada dobre wsparcie dla transakcji, mechanizmów kontroli współbieżności oraz integracji z JPA/Hibernate.
 
 ### 1.2 Język i framework
+
 - **Język programowania:** Java
 - **Framework:** Spring Boot + Hibernate (JPA)
 - **Uzasadnienie wyboru:** Połączenie Spring Boot i Hibernate umożliwia szybkie tworzenie aplikacji webowych i REST API z pełną obsługą ORM i transakcji.
@@ -22,9 +21,11 @@
 ## 2. Tematyka i założenia projektu
 
 ### 2.1 Temat projektu
+
 **System zarządzania księgarnią internetową**
 
 ### 2.2 Funkcjonalności
+
 - **Operacje CRUD:** Zarządzanie produktami (książki, gry, akcesoria), klientami, zamówieniami, autorami.
 - **Operacje transakcyjne:** Zakup produktu – tworzenie zamówienia z kontrolą stanu magazynowego i aktualizacją stanu produktów.
 - **Operacje raportujące:** Generowanie raportu sprzedaży wg kategorii, średnia ocena produktów, liczba zamówień wg statusu.
@@ -34,33 +35,41 @@
 ## 3. Projekt bazy danych
 
 ### 3.1 Model ERD
+
 (_Do uzupełnienia graficznie na podstawie poniższych relacji_)
 
 ### 3.2 Schemat bazy danych
 
-- **Produkty (`PRODUCTS`)**  
-  - Pola: `PRODUCT_ID`, `PRODUCT_NAME`, `PRICE`, `STOCK_QUANTITY`, `CATEGORY_ID`, `RATING`  
+- **Produkty (`PRODUCTS`)**
+
+  - Pola: `PRODUCT_ID`, `PRODUCT_NAME`, `PRICE`, `STOCK_QUANTITY`, `CATEGORY_ID`, `RATING`
   - Relacje: kategoria (wiele produktów do jednej kategorii), powiązania z książkami, grami, filmami, akcesoriami
 
-- **Kategorie (`CATEGORIES`)**  
+- **Kategorie (`CATEGORIES`)**
+
   - Pola: `CATEGORY_ID`, `CATEGORY_NAME`
 
-- **Książki (`BOOK_DETAILS`)**  
-  - ISBN, rok wydania, wydawca, język, liczba stron, opis  
+- **Książki (`BOOK_DETAILS`)**
+
+  - ISBN, rok wydania, wydawca, język, liczba stron, opis
   - Powiązanie z encją `PRODUCTS`
 
 - **Autorzy (`AUTHORS`)** i **relacja wiele-do-wielu (`BOOK_AUTHORS`)**
 
-- **Zamówienia (`ORDERS`)**  
+- **Zamówienia (`ORDERS`)**
+
   - Powiązane z klientem i dostawcą (shipper), status, data
 
-- **Szczegóły zamówienia (`ORDER_DETAILS`)**  
+- **Szczegóły zamówienia (`ORDER_DETAILS`)**
+
   - Powiązanie produkt–zamówienie, ilość, cena jednostkowa, rabat
 
-- **Płatności (`PAYMENTS`)**  
+- **Płatności (`PAYMENTS`)**
+
   - Data, status płatności (np. `PAID`, `FAILED`), powiązane z zamówieniem
 
-- **Klienci (`CUSTOMERS`)**  
+- **Klienci (`CUSTOMERS`)**
+
   - Dane osobowe, kontaktowe, adresowe
 
 - **Wydawcy (`PUBLISHERS`)**, **dostawcy (`SHIPPERS`)** itd.
@@ -86,6 +95,7 @@ public class BookshopApplication {
 ```
 
 ### Katalog entity
+
 ```java
 package org.example.bookshop.entity;
 
@@ -132,6 +142,7 @@ public class AccessoriesDetail {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -201,6 +212,7 @@ public class Author {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -248,6 +260,7 @@ public class BookAuthor {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -311,6 +324,7 @@ public class BookAuthorId implements Serializable {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -426,6 +440,7 @@ public class BookDetail {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -470,6 +485,7 @@ public class Category {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -594,6 +610,7 @@ public class Customer {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -672,6 +689,7 @@ public class GameDetail {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -772,6 +790,7 @@ public class MovieDetail {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -860,6 +879,7 @@ public class Order {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -914,6 +934,7 @@ public class OrderDetailId implements Serializable {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -929,6 +950,7 @@ public class OrderDetailId implements Serializable {
     private Long productID;
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -990,6 +1012,7 @@ public class Payment {
 
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -1067,6 +1090,7 @@ public class Product {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -1126,6 +1150,7 @@ public class Publisher {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.entity;
 
@@ -1159,6 +1184,7 @@ public class Shipper {
 ```
 
 ### Katalog dto
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1178,6 +1204,7 @@ public class AccessoriesDetailDTO {
     private String description;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1201,6 +1228,7 @@ public class AuthorDTO {
     private String biography;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1216,6 +1244,7 @@ public class BookAuthorDTO {
     private Long authorId;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1251,6 +1280,7 @@ public class BookDetailDTO {
     private String description;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1267,6 +1297,7 @@ public class CategoryDTO {
     private String categoryName;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1311,6 +1342,7 @@ public class CustomerDTO {
     private String country;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1339,6 +1371,7 @@ public class GameDetailDTO {
     private String description;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1449,6 +1482,7 @@ public class MovieDetailDTO {
 }
 
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1477,6 +1511,7 @@ public class OrderDetailDTO {
     private Float discount;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1503,6 +1538,7 @@ public class OrderDTO {
     private Long shipVia;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1526,6 +1562,7 @@ public class PaymentDTO {
     private String paymentStatus;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1557,6 +1594,7 @@ public class ProductDTO {
     private Long categoryId;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1576,6 +1614,7 @@ public class PublisherDTO {
     private String country;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1623,6 +1662,7 @@ public class PurchaseItemDTO {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1643,6 +1683,7 @@ public class PurchaseRequestDTO {
     private List<PurchaseItemDTO> items;
 }
 ```
+
 ```java
 package org.example.bookshop.dto;
 
@@ -1663,6 +1704,7 @@ public class ShipperDTO {
 ```
 
 ### Katalog repository
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1672,6 +1714,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AccessoriesDetailRepository extends JpaRepository<AccessoriesDetail, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1681,6 +1724,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1691,6 +1735,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BookAuthorRepository extends JpaRepository<BookAuthor, BookAuthorId> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1700,6 +1745,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BookDetailRepository extends JpaRepository<BookDetail, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1710,6 +1756,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1719,6 +1766,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1728,6 +1776,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface GameDetailRepository extends JpaRepository<GameDetail, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1737,6 +1786,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MovieDetailRepository extends JpaRepository<MovieDetail, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1746,6 +1796,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1755,6 +1806,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1764,6 +1816,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1781,6 +1834,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findProductForUpdate(@Param("id") Long id);
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1790,6 +1844,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PublisherRepository extends JpaRepository<Publisher, Long> {
 }
 ```
+
 ```java
 package org.example.bookshop.repository;
 
@@ -1801,6 +1856,7 @@ public interface ShipperRepository extends JpaRepository<Shipper, Long> {
 ```
 
 ### Katalog service
+
 ```java
 package org.example.bookshop.service;
 
@@ -1869,6 +1925,7 @@ public class AccessoriesService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -1928,6 +1985,7 @@ public class AuthorService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2036,6 +2094,7 @@ public class BookAuthorsService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2127,6 +2186,7 @@ public class BookService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2199,6 +2259,7 @@ public class CustomerService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2273,6 +2334,7 @@ public class GameService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2361,6 +2423,7 @@ public class MovieDetailService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2439,6 +2502,7 @@ public class MovieService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2529,6 +2593,7 @@ public class OrderService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2606,6 +2671,7 @@ public class PaymentService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -2778,6 +2844,7 @@ public class ProductService {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.service;
 
@@ -3015,6 +3082,7 @@ public class PurchaseService {
 ```
 
 ### Katalog controller
+
 ```java
 package org.example.bookshop.controller;
 
@@ -3079,6 +3147,7 @@ public class CustomerController {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.controller;
 
@@ -3150,6 +3219,7 @@ public class MovieDetailController {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.controller;
 
@@ -3214,6 +3284,7 @@ public class OrderController {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.controller;
 
@@ -3278,6 +3349,7 @@ public class PaymentController {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.controller;
 
@@ -3338,6 +3410,7 @@ public class ProductController {
     }
 }
 ```
+
 ```java
 package org.example.bookshop.controller;
 
@@ -3460,6 +3533,7 @@ public class PurchaseController {
 ```
 
 ### Katalog exception
+
 ```java
 package org.example.bookshop.exception;
 
@@ -3488,17 +3562,20 @@ public class GlobalExceptionHandler {
     }
 }
 ```
+
 ---
 
 ## 5. Opis technologii i komentarz
 
 ### 5.1 Opis zastosowanych rozwiązań
+
 - **Spring Data JPA** do mapowania encji na tabele
 - **Hibernate** do zarządzania transakcjami
 - **Oracle SQL** jako silnik bazy danych
 - **REST API** udostępniające operacje na danych
 
 ### 5.2 Wydajność i bezpieczeństwo
+
 - Indeksy na kluczach głównych i obcych
 - Walidacje danych (np. CHECK na `RATING`, `DISCOUNT`)
 - Obsługa wyjątków (np. brak na stanie)
@@ -3508,10 +3585,38 @@ public class GlobalExceptionHandler {
 
 ## 6. Prezentacja i testy
 
-
+![alt text](zrzuty/Zrzut_ekranu_2025-06-08_215941.png)
+![alt text](zrzuty/1.png)
+![alt text](zrzuty/2.png)
+![alt text](zrzuty/3.png)
+![alt text](zrzuty/4.png)
+![alt text](zrzuty/5.png)
+![alt text](zrzuty/6.png)
+![alt text](zrzuty/7.png)
+![alt text](zrzuty/8.png)
+![alt text](zrzuty/9.png)
+![alt text](zrzuty/10.png)
+![alt text](zrzuty/11.png)
+![alt text](zrzuty/12.png)
+![alt text](zrzuty/13.png)
+![alt text](zrzuty/14.png)
+![alt text](zrzuty/15.png)
+![alt text](zrzuty/16.png)
+![alt text](zrzuty/17.png)
+![alt text](zrzuty/18.png)
+![alt text](zrzuty/19.png)
+![alt text](zrzuty/20.png)
+![alt text](zrzuty/21.png)
+![alt text](zrzuty/22.png)
+![alt text](zrzuty/23.png)
+![alt text](zrzuty/24.png)
+![alt text](zrzuty/25.png)
+![alt text](zrzuty/26.png)
+![alt text](zrzuty/27.png)
+![alt text](zrzuty/28.png)
+![alt text](zrzuty/29.png)
 
 ---
-
 
 ## 7. Podsumowanie
 

@@ -82,6 +82,11 @@ public class PurchaseService {
                 productService.save(product);
 
                 OrderDetail orderDetail = new OrderDetail();
+                OrderDetailId orderDetailId = new OrderDetailId();
+                orderDetailId.setOrderID(order.getOrderID());
+                orderDetailId.setProductID(product.getProductID());
+
+                orderDetail.setId(orderDetailId);
                 orderDetail.setOrder(order);
                 orderDetail.setProduct(product);
                 orderDetail.setQuantity(item.getQuantity());

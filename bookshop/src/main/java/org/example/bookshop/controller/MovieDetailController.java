@@ -1,6 +1,7 @@
 package org.example.bookshop.controller;
 
 import org.example.bookshop.dto.MovieDetailDTO;
+import org.example.bookshop.repository.ProductRepository;
 import org.example.bookshop.service.MovieDetailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class MovieDetailController {
 
     private final MovieDetailService movieDetailService;
+    private final ProductRepository productRepository;
 
-    public MovieDetailController(MovieDetailService movieDetailService) {
+    public MovieDetailController(MovieDetailService movieDetailService, ProductRepository productRepository) {
         this.movieDetailService = movieDetailService;
+        this.productRepository = productRepository;
     }
 
     @GetMapping
@@ -57,6 +60,7 @@ public class MovieDetailController {
     public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
         try {
             movieDetailService.deleteById(id);
+            productRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

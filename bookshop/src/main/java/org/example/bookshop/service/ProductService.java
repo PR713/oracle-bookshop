@@ -59,46 +59,25 @@ public class ProductService {
             product.setCategory(category);
         }
 
-        // Zapisz główny produkt
+
         Product savedProduct = productRepository.save(product);
 
-        // Sprawdź kategorię i zapisz odpowiednie szczegóły
+
         String categoryName = savedProduct.getCategory().getCategoryName();
 
         if ("Book".equals(categoryName)) {
-            saveBookDetails(savedProduct);
+            //todo controllers :)
         } else if ("Movie".equals(categoryName)) {
             saveMovieDetails(savedProduct);
         } else if ("Game".equals(categoryName)) {
-            saveGameDetails(savedProduct);
+            //todo controllers :)
         } else if ("Accessories".equals(categoryName)) {
-            saveAccessoriesDetails(savedProduct);
+            //todo controllers :)
         }
 
         return savedProduct;
     }
 
-    private void saveBookDetails(Product product) {
-        // Sprawdź czy już istnieją szczegóły książki
-        Optional<BookDetail> existingBookDetail = bookDetailRepository.findById(product.getProductID());
-
-        BookDetail bookDetail;
-        if (existingBookDetail.isPresent()) {
-            bookDetail = existingBookDetail.get();
-        } else {
-            bookDetail = new BookDetail();
-            bookDetail.setProduct(product);
-            // Ustaw domyślne wartości jeśli nie ma szczegółów
-            bookDetail.setIsbn(""); // lub generuj ISBN
-            bookDetail.setPublicationYear(2024); // lub pobierz z innego źródła
-            bookDetail.setLanguage("Polish");
-            bookDetail.setPageCount(100);
-            bookDetail.setDescription("No description available");
-            // publisher zostanie ustawiony przez inne części aplikacji
-        }
-
-        bookDetailRepository.save(bookDetail);
-    }
 
     private void saveMovieDetails(Product product) {
         Optional<MovieDetail> existingMovieDetail = movieDetailRepository.findById(product.getProductID());
@@ -109,7 +88,7 @@ public class ProductService {
         } else {
             movieDetail = new MovieDetail();
             movieDetail.setProduct(product);
-            // Ustaw domyślne wartości
+
             movieDetail.setDirector("Unknown Director");
             movieDetail.setDurationInMinutes(120);
             movieDetail.setReleaseYear(2024);

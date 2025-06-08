@@ -12,7 +12,6 @@ public class PurchaseItemDTO {
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
-    // Konstruktory
     public PurchaseItemDTO() {}
 
     public PurchaseItemDTO(Long productId, Integer quantity) {
@@ -20,7 +19,6 @@ public class PurchaseItemDTO {
         this.quantity = quantity;
     }
 
-    // Getters and Setters
     public Long getProductId() {
         return productId;
     }

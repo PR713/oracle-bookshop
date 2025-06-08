@@ -98,7 +98,7 @@ CREATE TABLE ORDERS (
                         CUSTOMER_ID NUMBER NOT NULL,
                         ORDER_DATE DATE NOT NULL,
                         ORDER_STATUS VARCHAR2(20) NOT NULL,
-                        SHIP_VIA NUMBER NOT NULL,
+                        SHIP_VIA NUMBER,
                         CONSTRAINT ORDER_STATUS CHECK (ORDER_STATUS IN ('NEW', 'CANCELLED', 'COMPLETED', 'PROCESSING')),
                         CONSTRAINT ORDERS_PK PRIMARY KEY (ORDER_ID)
 );

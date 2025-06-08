@@ -57,9 +57,10 @@ public class PurchaseService {
         orderDTO.setCustomerId(customer.getCustomerID());
         orderDTO.setOrderDate(LocalDate.from(LocalDateTime.now()));
         orderDTO.setOrderStatus("NEW");
+        orderDTO.setShipVia(null);
 
         OrderDTO savedOrderDTO = orderService.save(orderDTO);
-        Order order = orderService.convertToEntity(orderDTO);
+        Order order = orderService.convertToEntity(savedOrderDTO);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 

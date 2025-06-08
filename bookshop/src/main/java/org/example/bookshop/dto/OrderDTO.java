@@ -19,6 +19,5 @@ public class OrderDTO {
             message = "Order status must be NEW, CANCELLED, COMPLETED, or PROCESSING")
     private String orderStatus;
 
-    @NotNull(message = "Shipper ID is required")
     private Long shipVia;
 }

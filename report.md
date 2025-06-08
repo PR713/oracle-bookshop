@@ -3585,6 +3585,8 @@ public class GlobalExceptionHandler {
 
 ## 6. Prezentacja i testy
 
+![alt text](zrzuty/image2.png)
+![alt text](zrzuty/image1.png)
 ![alt text](zrzuty/Zrzut_ekranu_2025-06-08_215941.png)
 ![alt text](zrzuty/1.png)
 ![alt text](zrzuty/2.png)
@@ -3615,6 +3617,19 @@ public class GlobalExceptionHandler {
 ![alt text](zrzuty/27.png)
 ![alt text](zrzuty/28.png)
 ![alt text](zrzuty/29.png)
+![alt text](zrzuty/30.png)
+![alt text](zrzuty/31.png)
+![alt text](zrzuty/32.png)
+![alt text](zrzuty/33.png)
+![alt text](zrzuty/34.png)
+![alt text](zrzuty/35.png)
+![alt text](zrzuty/36.png)
+![alt text](zrzuty/37.png)
+![alt text](zrzuty/38.png)
+![alt text](zrzuty/39.png)
+![alt text](zrzuty/40.png)
+![alt text](zrzuty/image.png)
+![alt text](zrzuty/41.png)
 
 ---
 

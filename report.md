@@ -8,7 +8,7 @@
 
 - **Typ:** Relacyjna
 - **Wybrany system:** Oracle Database
-- **Uzasadnienie wyboru:** Oracle to stabilna, wydajna i szeroko wykorzystywana baza danych. Posiada dobre wsparcie dla transakcji, mechanizmów kontroli współbieżności oraz integracji z JPA/Hibernate.
+- **Uzasadnienie wyboru:** Oracle to stabilna, wydajna i szeroko wykorzystywana baza danych. Posiada dobre wsparcie dla transakcji, mechanizmów kontroli współbieżności oraz integracji z JPA/Hibernate/Spring.
 
 ### 1.2 Język i framework
 
@@ -18,13 +18,11 @@
 
 ---
 
-## 2. Tematyka i założenia projektu
-
-### 2.1 Temat projektu
+## 2. Tematyka projektu
 
 **System zarządzania księgarnią internetową**
 
-### 2.2 Funkcjonalności
+### 2.1 Funkcjonalności
 
 - **Operacje CRUD:** Zarządzanie produktami (książki, gry, akcesoria), klientami, zamówieniami, autorami.
 - **Operacje transakcyjne:** Zakup produktu – tworzenie zamówienia z kontrolą stanu magazynowego i aktualizacją stanu produktów.
@@ -36,43 +34,395 @@
 
 ### 3.1 Model ERD
 
-(_Do uzupełnienia graficznie na podstawie poniższych relacji_)
+![alt text](./oracle_bookshop-2025-06-04_13-44.svg)
+
+
 
 ### 3.2 Schemat bazy danych
 
-- **Produkty (`PRODUCTS`)**
+Baza danych zawiera tabele reprezentujące produkty, klientów, zamówienia, płatności, oraz szczegóły związane z różnymi typami produktów (książki, gry, filmy, akcesoria).
 
-  - Pola: `PRODUCT_ID`, `PRODUCT_NAME`, `PRICE`, `STOCK_QUANTITY`, `CATEGORY_ID`, `RATING`
-  - Relacje: kategoria (wiele produktów do jednej kategorii), powiązania z książkami, grami, filmami, akcesoriami
+#### **Główne tabele:**
 
-- **Kategorie (`CATEGORIES`)**
+- **PRODUCTS**  
+  Informacje o wszystkich produktach: nazwa, cena, stan magazynowy, kategoria, ocena.
 
-  - Pola: `CATEGORY_ID`, `CATEGORY_NAME`
+- **CATEGORIES**  
+  Kategorie produktów (np. książki, gry, filmy, akcesoria).
 
-- **Książki (`BOOK_DETAILS`)**
+- **BOOK_DETAILS**  
+  Szczegóły książek: ISBN, rok wydania, język, liczba stron, wydawca, opis.
 
-  - ISBN, rok wydania, wydawca, język, liczba stron, opis
-  - Powiązanie z encją `PRODUCTS`
+- **AUTHORS**  
+  Dane autorów książek.
 
-- **Autorzy (`AUTHORS`)** i **relacja wiele-do-wielu (`BOOK_AUTHORS`)**
+- **BOOK_AUTHORS**  
+  Tabela łącząca książki z autorami (relacja wiele-do-wielu).
 
-- **Zamówienia (`ORDERS`)**
+- **GAME_DETAILS**  
+  Szczegóły gier: platforma, deweloper, rok wydania, opis.
 
-  - Powiązane z klientem i dostawcą (shipper), status, data
+- **MOVIE_DETAILS**  
+  Szczegóły filmów: reżyser, czas trwania, język, gatunek, rok, opis.
 
-- **Szczegóły zamówienia (`ORDER_DETAILS`)**
+- **ACCESSORIES_DETAILS**  
+  Opisy akcesoriów (np. gadżety, dodatki).
 
-  - Powiązanie produkt–zamówienie, ilość, cena jednostkowa, rabat
+#### **Obsługa zamówień i klientów:**
 
-- **Płatności (`PAYMENTS`)**
+- **CUSTOMERS**  
+  Dane klientów: imię, nazwisko, email, telefon, adres.
 
-  - Data, status płatności (np. `PAID`, `FAILED`), powiązane z zamówieniem
+- **ORDERS**  
+  Zamówienia: klient, data, status, dostawca.
 
-- **Klienci (`CUSTOMERS`)**
+- **ORDER_DETAILS**  
+  Szczegóły zamówień: produkt, ilość, cena jednostkowa, rabat.
 
-  - Dane osobowe, kontaktowe, adresowe
+- **PAYMENTS**  
+  Płatności do zamówień: data, status (NEW, PAID, FAILED).
 
-- **Wydawcy (`PUBLISHERS`)**, **dostawcy (`SHIPPERS`)** itd.
+#### **Dodatkowe tabele:**
+
+- **PUBLISHERS**  
+  Wydawcy książek.
+
+- **SHIPPERS**  
+  Firmy dostawcze.
+
+#### **Klucze główne i relacje:**
+
+- Większość tabel posiada klucz główny (`PRIMARY KEY`) oraz powiązania (`FOREIGN KEY`) z innymi tabelami.  
+- Produkty są powiązane z kategoriami oraz szczegółami zależnymi od typu (książka, film, gra, akcesorium).  
+- Zamówienia powiązane są z klientami, szczegółami zamówienia, płatnościami i dostawcami.  
+- Książki mają relacje z autorami i wydawcami.
+
+#### **Sekwencje:**
+
+- Do automatycznego generowania identyfikatorów używane są sekwencje (`SEQUENCE`) np. `PRODUCT_SEQ`, `AUTHOR_SEQ` itd.
+
+#### Główne operacje transakcyjne obejmują:
+
+- **Proces zakupu** (w klasie `PurchaseService`):
+  - Rozpoczęcie transakcji (`@Transactional`)
+  - Blokowanie pesymistyczne produktów (`LockModeType.PESSIMISTIC_WRITE`)
+  - Sprawdzenie stanu magazynowego
+  - Aktualizacja ilości produktów
+  - Tworzenie zamówienia i płatności
+  - Obsługa wyjątków i rollback w przypadku błędów
+
+```java
+@Transactional(rollbackFor = Exception.class)
+public Order purchaseProducts(PurchaseRequestDTO request) {
+    // Implementacja procesu zakupu
+}
+```
+
+
+#### Dla większości encji zaimplementowaliśmy pełny zestaw uperacji CRUD za pomocą:
+- Repozytoriów Spring Data JPA (np. ProductRepository)
+- Warstw serwisowych (np. ProductService)
+- Kontrolerów REST (np. ProductController)
+
+### Kluczowe funkcjonalności
+
+**Mapowanie obiektowo-relacyjne**
+
+- Encje JPA z adnotacjami `@Entity`, `@Table`
+- Relacje: `@OneToMany`, `@ManyToOne`, `@ManyToMany`
+- Klucze złożone: `@Embeddable`, `@EmbeddedId`
+
+**Transakcje**
+
+- Zarządzanie przez Spring za pomocą `@Transactional`
+- Obsługa izolacji i propagacji transakcji
+- Blokowanie pesymistyczne w celu kontroli współbieżności (Zakładamy, że konflikt dostępu
+ do danych będzie występował często, więc blokujemy dane od razu na czas operacji)
+
+**Warstwa serwisowa**
+
+- Implementacja logiki biznesowej
+- Walidacja danych
+- Konwersja DTO ↔ Entity
+
+**REST API**
+
+- Endpointy dla wszystkich encji
+- Obsługa błędów
+- Walidacja żądań
+
+
+## 3.3 Kod DDL
+```sql
+-- TABLES
+-- TABLE: ACCESSORIES_DETAILS
+CREATE TABLE ACCESSORIES_DETAILS (
+                                     ACCESSORY_ID NUMBER NOT NULL,
+                                     DESCRIPTION VARCHAR2(100) NOT NULL,
+                                     CONSTRAINT ACCESSORIES_DETAILS_PK PRIMARY KEY (ACCESSORY_ID)
+);
+
+-- TABLE: AUTHORS
+CREATE TABLE AUTHORS (
+                         AUTHOR_ID NUMBER NOT NULL,
+                         FIRST_NAME VARCHAR2(100) NOT NULL,
+                         LAST_NAME VARCHAR2(100) NOT NULL,
+                         BIOGRAPHY VARCHAR2(100) NOT NULL,
+                         CONSTRAINT AUTHORS_PK PRIMARY KEY (AUTHOR_ID)
+);
+
+-- TABLE: BOOK_AUTHORS
+CREATE TABLE BOOK_AUTHORS (
+                              BOOK_ID NUMBER NOT NULL,
+                              AUTHOR_ID NUMBER NOT NULL,
+                              CONSTRAINT BOOK_AUTHORS_PK PRIMARY KEY (BOOK_ID, AUTHOR_ID)
+);
+
+-- TABLE: BOOK_DETAILS
+CREATE TABLE BOOK_DETAILS (
+                              BOOK_ID NUMBER NOT NULL,
+                              ISBN VARCHAR2(20) NOT NULL,
+                              PUBLICATION_YEAR NUMBER NOT NULL,
+                              PUBLISHER_ID NUMBER NOT NULL,
+                              LANGUAGE VARCHAR2(50) NOT NULL,
+                              PAGE_COUNT NUMBER NOT NULL,
+                              DESCRIPTION VARCHAR2(100) NOT NULL,
+                              CONSTRAINT PAGES CHECK (PAGE_COUNT > 0),
+                              CONSTRAINT YEAR CHECK (PUBLICATION_YEAR >= 1900),
+                              CONSTRAINT BOOK_DETAILS_PK PRIMARY KEY (BOOK_ID)
+);
+
+-- TABLE: CATEGORIES
+CREATE TABLE CATEGORIES (
+                            CATEGORY_ID NUMBER NOT NULL,
+                            CATEGORY_NAME VARCHAR2(50) NOT NULL,
+                            CONSTRAINT CATEGORIES_PK PRIMARY KEY (CATEGORY_ID)
+);
+
+-- TABLE: CUSTOMERS
+CREATE TABLE CUSTOMERS (
+                           CUSTOMER_ID NUMBER NOT NULL,
+                           FIRST_NAME VARCHAR2(100) NOT NULL,
+                           LAST_NAME VARCHAR2(100) NOT NULL,
+                           EMAIL VARCHAR2(100) NOT NULL,
+                           PHONE VARCHAR2(20) NOT NULL,
+                           ADDRESS VARCHAR2(200) NOT NULL,
+                           CITY VARCHAR2(50) NOT NULL,
+                           POSTAL_CODE VARCHAR2(10) NOT NULL,
+                           COUNTRY VARCHAR2(50) NOT NULL,
+                           CONSTRAINT CUSTOMERS_PK PRIMARY KEY (CUSTOMER_ID)
+);
+
+-- TABLE: GAME_DETAILS
+CREATE TABLE GAME_DETAILS (
+                              GAME_ID NUMBER NOT NULL,
+                              PLATFORM VARCHAR2(50) NOT NULL,
+                              DEVELOPER VARCHAR2(50) NOT NULL,
+                              RELEASE_YEAR NUMBER NOT NULL,
+                              DESCRIPTION VARCHAR2(100) NOT NULL,
+                              CONSTRAINT R_YEAR CHECK (RELEASE_YEAR >= 1900),
+                              CONSTRAINT GAME_DETAILS_PK PRIMARY KEY (GAME_ID)
+);
+
+-- TABLE: MOVIE_DETAILS
+CREATE TABLE MOVIE_DETAILS (
+                               MOVIE_ID NUMBER NOT NULL,
+                               DIRECTOR VARCHAR2(100) NOT NULL,
+                               DURATION_IN_MINUTES NUMBER NOT NULL,
+                               RELEASE_YEAR NUMBER NOT NULL,
+                               LANGUAGE VARCHAR2(50) NOT NULL,
+                               GENRE VARCHAR2(50) NOT NULL,
+                               DESCRIPTION VARCHAR2(100) NOT NULL,
+                               CONSTRAINT TIME CHECK (DURATION_IN_MINUTES > 0),
+                               CONSTRAINT MOVIE_DETAILS_PK PRIMARY KEY (MOVIE_ID)
+);
+
+-- TABLE: ORDER_DETAILS
+CREATE TABLE ORDER_DETAILS (
+                               ORDER_ID NUMBER NOT NULL,
+                               PRODUCT_ID NUMBER NOT NULL,
+                               QUANTITY NUMBER NOT NULL,
+                               UNIT_PRICE NUMBER(10,2) NOT NULL,
+                               DISCOUNT NUMBER(10,2) NOT NULL,
+                               CONSTRAINT DISCOUNT CHECK (DISCOUNT >= 0 AND DISCOUNT <= 1),
+                               CONSTRAINT ORDER_DETAILS_PK PRIMARY KEY (PRODUCT_ID, ORDER_ID)
+);
+
+-- TABLE: ORDERS
+CREATE TABLE ORDERS (
+                        ORDER_ID NUMBER NOT NULL,
+                        CUSTOMER_ID NUMBER NOT NULL,
+                        ORDER_DATE DATE NOT NULL,
+                        ORDER_STATUS VARCHAR2(20) NOT NULL,
+                        SHIP_VIA NUMBER,
+                        CONSTRAINT ORDER_STATUS CHECK (ORDER_STATUS IN ('NEW', 'CANCELLED', 'COMPLETED', 'PROCESSING')),
+                        CONSTRAINT ORDERS_PK PRIMARY KEY (ORDER_ID)
+);
+
+-- TABLE: PAYMENTS
+CREATE TABLE PAYMENTS (
+                          PAYMENT_ID NUMBER NOT NULL,
+                          ORDER_ID NUMBER NOT NULL,
+                          PAYMENT_DATE DATE NOT NULL,
+                          PAYMENT_STATUS VARCHAR2(20) NOT NULL,
+                          CONSTRAINT PAYMENT_STATUS CHECK (PAYMENT_STATUS IN ('NEW', 'PAID', 'FAILED')),
+                          CONSTRAINT PAYMENTS_PK PRIMARY KEY (PAYMENT_ID)
+);
+
+-- TABLE: PRODUCTS
+CREATE TABLE PRODUCTS (
+                          PRODUCT_ID NUMBER NOT NULL,
+                          PRODUCT_NAME VARCHAR2(50) NOT NULL,
+                          PRICE NUMBER(10,2) NOT NULL,
+                          STOCK_QUANTITY NUMBER NOT NULL,
+                          CATEGORY_ID NUMBER NOT NULL,
+                          RATING NUMBER(1) NOT NULL,
+                          CONSTRAINT RATING CHECK (RATING BETWEEN 1 AND 5),
+                          CONSTRAINT PRODUCTS_PK PRIMARY KEY (PRODUCT_ID)
+);
+
+-- TABLE: PUBLISHERS
+CREATE TABLE PUBLISHERS (
+                            PUBLISHER_ID NUMBER NOT NULL,
+                            PUBLISHER_NAME VARCHAR2(100) NOT NULL,
+                            COUNTRY VARCHAR2(50) NOT NULL,
+                            CONSTRAINT PUBLISHERS_PK PRIMARY KEY (PUBLISHER_ID)
+);
+
+-- TABLE: SHIPPERS
+CREATE TABLE SHIPPERS (
+                          SHIPPER_ID NUMBER NOT NULL,
+                          COMPANY_NAME VARCHAR2(100) NOT NULL,
+                          PHONE NUMBER(20) NOT NULL,
+                          CONSTRAINT SHIPPERS_PK PRIMARY KEY (SHIPPER_ID)
+);
+
+-- FOREIGN KEYS
+-- REFERENCE: AUTHORS_BOOK_AUTHORS (TABLE: BOOK_AUTHORS)
+ALTER TABLE BOOK_AUTHORS ADD CONSTRAINT AUTHORS_BOOK_AUTHORS
+    FOREIGN KEY (AUTHOR_ID)
+        REFERENCES AUTHORS (AUTHOR_ID);
+
+-- REFERENCE: BOOK_DETAILS_BOOK_AUTHORS (TABLE: BOOK_AUTHORS)
+ALTER TABLE BOOK_AUTHORS ADD CONSTRAINT BOOK_DETAILS_BOOK_AUTHORS
+    FOREIGN KEY (BOOK_ID)
+        REFERENCES BOOK_DETAILS (BOOK_ID);
+
+-- REFERENCE: BOOK_DETAILS_PUBLISHERS (TABLE: BOOK_DETAILS)
+ALTER TABLE BOOK_DETAILS ADD CONSTRAINT BOOK_DETAILS_PUBLISHERS
+    FOREIGN KEY (PUBLISHER_ID)
+        REFERENCES PUBLISHERS (PUBLISHER_ID);
+
+ALTER TABLE BOOK_DETAILS ADD CONSTRAINT UNIQUE_ISBN UNIQUE (ISBN);
+
+-- REFERENCE: MOVIE_DETAILS_PRODUCTS (TABLE: MOVIE_DETAILS)
+ALTER TABLE MOVIE_DETAILS ADD CONSTRAINT MOVIE_DETAILS_PRODUCTS
+    FOREIGN KEY (MOVIE_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
+
+-- REFERENCE: ORDER_DETAILS_ORDERS (TABLE: ORDER_DETAILS)
+ALTER TABLE ORDER_DETAILS ADD CONSTRAINT ORDER_DETAILS_ORDERS
+    FOREIGN KEY (ORDER_ID)
+        REFERENCES ORDERS (ORDER_ID);
+
+-- REFERENCE: ORDERS_CUSTOMERS (TABLE: ORDERS)
+ALTER TABLE ORDERS ADD CONSTRAINT ORDERS_CUSTOMERS
+    FOREIGN KEY (CUSTOMER_ID)
+        REFERENCES CUSTOMERS (CUSTOMER_ID);
+
+-- REFERENCE: PAYMENTS_ORDERS (TABLE: PAYMENTS)
+ALTER TABLE PAYMENTS ADD CONSTRAINT PAYMENTS_ORDERS
+    FOREIGN KEY (ORDER_ID)
+        REFERENCES ORDERS (ORDER_ID);
+
+-- REFERENCE: PRODUCTS_ACCESSORIES_DETAILS (TABLE: ACCESSORIES_DETAILS)
+ALTER TABLE ACCESSORIES_DETAILS ADD CONSTRAINT PRODUCTS_ACCESSORIES_DETAILS
+    FOREIGN KEY (ACCESSORY_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
+
+-- REFERENCE: PRODUCTS_BOOK_DETAILS (TABLE: BOOK_DETAILS)
+ALTER TABLE BOOK_DETAILS ADD CONSTRAINT PRODUCTS_BOOK_DETAILS
+    FOREIGN KEY (BOOK_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
+
+-- REFERENCE: PRODUCTS_CATEGORIES (TABLE: PRODUCTS)
+ALTER TABLE PRODUCTS ADD CONSTRAINT PRODUCTS_CATEGORIES
+    FOREIGN KEY (CATEGORY_ID)
+        REFERENCES CATEGORIES (CATEGORY_ID);
+
+-- REFERENCE: PRODUCTS_GAME_DETAILS (TABLE: GAME_DETAILS)
+ALTER TABLE GAME_DETAILS ADD CONSTRAINT PRODUCTS_GAME_DETAILS
+    FOREIGN KEY (GAME_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
+
+-- REFERENCE: PRODUCTS_ORDER_DETAILS (TABLE: ORDER_DETAILS)
+ALTER TABLE ORDER_DETAILS ADD CONSTRAINT PRODUCTS_ORDER_DETAILS
+    FOREIGN KEY (PRODUCT_ID)
+        REFERENCES PRODUCTS (PRODUCT_ID);
+
+-- REFERENCE: SHIPPERS_ORDERS (TABLE: ORDERS)
+ALTER TABLE ORDERS ADD CONSTRAINT SHIPPERS_ORDERS
+    FOREIGN KEY (SHIP_VIA)
+        REFERENCES SHIPPERS (SHIPPER_ID);
+
+
+--------------------------------------------
+
+
+
+CREATE SEQUENCE PRODUCT_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE AUTHOR_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE CATEGORY_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE CUSTOMER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE ORDER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE PAYMENT_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE PUBLISHER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE SHIPPER_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+
+ALTER TABLE products
+    ADD CONSTRAINT chk_price_positive CHECK (price > 0);
+
+```
 
 ---
 
@@ -364,7 +714,8 @@ public class BookDetail {
     private Publisher publisher;
 
     @ManyToMany
-    @JoinTable(name = "BOOK_AUTHORS", joinColumns = @JoinColumn(name = "BOOK_ID"), inverseJoinColumns = @JoinColumn(name = "AUTHOR_ID"))
+    @JoinTable(name = "BOOK_AUTHORS", joinColumns = @JoinColumn(name = "BOOK_ID"),
+                     inverseJoinColumns = @JoinColumn(name = "AUTHOR_ID"))
     private List<Author> authors;
 
     public Long getBookID() {
@@ -1534,7 +1885,6 @@ public class OrderDTO {
             message = "Order status must be NEW, CANCELLED, COMPLETED, or PROCESSING")
     private String orderStatus;
 
-    @NotNull(message = "Shipper ID is required")
     private Long shipVia;
 }
 ```
@@ -2829,6 +3179,11 @@ public class ProductService {
 
     private Product convertToEntity(ProductDTO dto) {
         Product product = new Product();
+
+        if (dto.getProductId() != null) {
+            product.setProductID(dto.getProductId());
+        }
+
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
@@ -2894,7 +3249,7 @@ public class PurchaseService {
     }
 
     /**
-     * pessimistic locking - transakcja zakupu z kontrolą równoczesnego dostępu
+     * pessimistic locking - założyliśmy transakcję zakupu z kontrolą równoczesnego dostępu
      */
     @Transactional(rollbackFor = Exception.class)
     public Order purchaseProducts(PurchaseRequestDTO request) {
@@ -2905,16 +3260,18 @@ public class PurchaseService {
         orderDTO.setCustomerId(customer.getCustomerID());
         orderDTO.setOrderDate(LocalDate.from(LocalDateTime.now()));
         orderDTO.setOrderStatus("NEW");
+        orderDTO.setShipVia(null);
 
         OrderDTO savedOrderDTO = orderService.save(orderDTO);
-        Order order = orderService.convertToEntity(orderDTO);
+        Order order = orderService.convertToEntity(savedOrderDTO);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         try {
             for (PurchaseItemDTO item : request.getItems()) {
                 // PESSIMISTIC LOCK - blokujemy rekord w bazie danych dla race condition
-                Product product = entityManager.find(Product.class, item.getProductId(), LockModeType.PESSIMISTIC_WRITE);
+                Product product = entityManager.find(Product.class, item.getProductId(),
+                                     LockModeType.PESSIMISTIC_WRITE);
 
                 if (product == null) {
                     throw new RuntimeException("Product not found: " + item.getProductId());
@@ -2939,6 +3296,7 @@ public class PurchaseService {
                 orderDetail.setProduct(product);
                 orderDetail.setQuantity(item.getQuantity());
                 orderDetail.setUnitPrice(product.getPrice());
+                orderDetail.setDiscount(item.getDiscount());
                 orderDetailRepository.save(orderDetail);
 
                 totalAmount = totalAmount.add(
@@ -3037,8 +3395,7 @@ public class PurchaseService {
         if ("COMPLETED".equals(orderDTO.getOrderStatus())) {
             throw new RuntimeException("Completed orders cannot be cancelled");
         }
-
-        // Przywrócenie stanu magazynowego
+        
         Order order = entityManager.find(Order.class, orderId);
         if (order != null && order.getOrderDetails() != null) {
             for (OrderDetail detail : order.getOrderDetails()) {
@@ -3080,6 +3437,198 @@ public class PurchaseService {
     }
 }
 ```
+
+```java
+package org.example.bookshop.service;
+
+import org.example.bookshop.dto.*;
+import org.example.bookshop.repository.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
+
+@Service
+@Transactional(readOnly = true)
+public class ReportingService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportingService.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+
+    public ReportingService(ProductRepository productRepository,
+                            OrderRepository orderRepository) {
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+    }
+
+    /**
+     * Produkty z niskim stanem magazynowym (poniżej 10 sztuk)
+     */
+    public List<LowStockReportDTO> getLowStockProducts() {
+        log.info("Generating low stock products report");
+
+        try {
+            String productJpql = """
+                SELECT p.productId, p.name, p.stock, p.price, c.categoryName
+                FROM Product p
+                LEFT JOIN p.category c
+                WHERE p.stock <= 10
+                ORDER BY p.stock ASC
+                """;
+
+            List<Object[]> productResults = entityManager.createQuery(productJpql, Object[].class)
+                    .getResultList();
+
+            List<LowStockReportDTO> reports = new ArrayList<>();
+            LocalDateTime lastMonth = LocalDateTime.now().minusMonths(1);
+
+            for (Object[] row : productResults) {
+                Long productId = (Long) row[0];
+                String productName = (String) row[1];
+                Integer stockQuantity = (Integer) row[2];
+                BigDecimal price = (BigDecimal) row[3];
+                String categoryName = row[4] != null ? (String) row[4] : "Bez kategorii";
+
+                String salesJpql = """
+                    SELECT COALESCE(SUM(od.quantity), 0)
+                    FROM OrderDetail od
+                    JOIN od.order o
+                    WHERE od.product.productId = :productId
+                    AND o.orderDate >= :lastMonth
+                    AND o.orderStatus = 'COMPLETED'
+                    """;
+
+                Long recentSales = entityManager.createQuery(salesJpql, Long.class)
+                        .setParameter("productId", productId)
+                        .setParameter("lastMonth", lastMonth)
+                        .getSingleResult();
+
+                reports.add(new LowStockReportDTO(
+                        productId, productName, stockQuantity, price, categoryName, recentSales
+                ));
+            }
+
+            log.info("Low stock report generated successfully with {} products", reports.size());
+            return reports;
+
+        } catch (Exception e) {
+            log.error("Error generating low stock products report", e);
+            throw new RuntimeException("Failed to generate low stock report", e);
+        }
+    }
+
+    /**
+     * Miesięczny raport zamówień za bieżący miesiąc
+     */
+    public MonthlyOrdersReportDTO getCurrentMonthOrdersReport() {
+        LocalDateTime now = LocalDateTime.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+
+        log.info("Generating monthly orders report for {}/{}", month, year);
+
+        try {
+            String ordersJpql = """
+                SELECT o.orderID, 
+                       CONCAT(c.firstName, ' ', c.lastName), 
+                       o.orderDate, 
+                       o.orderStatus
+                FROM Order o
+                JOIN o.customer c
+                WHERE EXTRACT(YEAR FROM o.orderDate) = :year
+                AND EXTRACT(MONTH FROM o.orderDate) = :month
+                ORDER BY o.orderDate DESC
+                """;
+
+            List<Object[]> orderResults = entityManager.createQuery(ordersJpql, Object[].class)
+                    .setParameter("year", year)
+                    .setParameter("month", month)
+                    .getResultList();
+
+            List<MonthlyOrderDTO> orders = new ArrayList<>();
+            BigDecimal totalRevenue = BigDecimal.ZERO;
+            Long completedOrders = 0L;
+            Long uniqueCustomers = 0L;
+
+            for (Object[] row : orderResults) {
+                Long orderId = (Long) row[0];
+                String customerName = (String) row[1];
+                LocalDateTime orderDate = (LocalDateTime) row[2];
+                String orderStatus = (String) row[3];
+
+                String orderValueJpql = """
+                    SELECT COALESCE(SUM(od.quantity * od.unitPrice), 0)
+                    FROM OrderDetail od
+                    WHERE od.order.orderID = :orderId
+                    """;
+
+                BigDecimal orderValue = entityManager.createQuery(orderValueJpql, BigDecimal.class)
+                        .setParameter("orderId", orderId)
+                        .getSingleResult();
+
+                orders.add(new MonthlyOrderDTO(orderId, customerName, orderDate, orderValue, orderStatus));
+
+                if ("COMPLETED".equals(orderStatus)) {
+                    totalRevenue = totalRevenue.add(orderValue);
+                    completedOrders++;
+                }
+            }
+
+            String uniqueCustomersJpql = """
+                SELECT COUNT(DISTINCT o.customer.customerID)
+                FROM Order o
+                WHERE EXTRACT(YEAR FROM o.orderDate) = :year
+                AND EXTRACT(MONTH FROM o.orderDate) = :month
+                AND o.orderStatus = 'COMPLETED'
+                """;
+
+            uniqueCustomers = entityManager.createQuery(uniqueCustomersJpql, Long.class)
+                    .setParameter("year", year)
+                    .setParameter("month", month)
+                    .getSingleResult();
+
+            BigDecimal averageOrderValue = BigDecimal.ZERO;
+            if (completedOrders > 0) {
+                averageOrderValue = totalRevenue.divide(
+                        BigDecimal.valueOf(completedOrders), 2, RoundingMode.HALF_UP
+                );
+            }
+
+            MonthlyOrdersReportDTO report = new MonthlyOrdersReportDTO(
+                    year,
+                    month,
+                    (long) orders.size(),
+                    totalRevenue,
+                    uniqueCustomers,
+                    averageOrderValue,
+                    orders
+            );
+
+            log.info("Monthly report generated successfully: {} orders, revenue: {}",
+                    orders.size(), totalRevenue);
+            return report;
+
+        } catch (Exception e) {
+            log.error("Error generating monthly orders report for {}/{}", month, year, e);
+            throw new RuntimeException("Failed to generate monthly orders report", e);
+        }
+    }
+}
+```
+
 
 ### Katalog controller
 
@@ -3126,7 +3675,8 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @Valid @RequestBody 
+                                                CustomerDTO customerDTO) {
         return customerService.findById(id)
                 .map(existingCustomer -> {
                     customerDTO.setCustomerId(id);
@@ -3185,7 +3735,7 @@ public class MovieDetailController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping//to little fix 404
     public ResponseEntity<MovieDetailDTO> createMovie(@RequestBody MovieDetailDTO movieDetailDTO) {
         try {
             MovieDetailDTO savedMovie = movieDetailService.save(movieDetailDTO);
@@ -3393,6 +3943,7 @@ public class ProductController {
                                                     @Valid @RequestBody ProductDTO productDTO) {
         return productService.findById(id)
                 .map(existingProduct -> {
+                    productDTO.setProductId(id);
                     ProductDTO updatedProduct = productService.save(productDTO);
                     return ResponseEntity.ok(updatedProduct);
                 })
@@ -3532,6 +4083,58 @@ public class PurchaseController {
 }
 ```
 
+```java
+package org.example.bookshop.controller;
+
+import org.example.bookshop.dto.*;
+import org.example.bookshop.service.ReportingService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Collections;
+
+@RestController
+@RequestMapping("/api/reports")
+public class ReportingController {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportingController.class);
+    private final ReportingService reportingService;
+
+    public ReportingController(ReportingService reportingService) {
+        this.reportingService = reportingService;
+    }
+
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<LowStockReportDTO>> getLowStockProducts() {
+        try {
+            log.info("Requesting low stock products report");
+            List<LowStockReportDTO> report = reportingService.getLowStockProducts();
+            log.info("Low stock report returned {} products", report.size());
+            return ResponseEntity.ok(report);
+        } catch (Exception e) {
+            log.error("Error in low-stock endpoint", e);
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+    }
+
+    @GetMapping("/monthly-orders")
+    public ResponseEntity<MonthlyOrdersReportDTO> getCurrentMonthOrders() {
+        try {
+            log.info("Requesting monthly orders report");
+            MonthlyOrdersReportDTO report = reportingService.getCurrentMonthOrdersReport();
+            log.info("Monthly orders report generated successfully");
+            return ResponseEntity.ok(report);
+        } catch (Exception e) {
+            log.error("Error in monthly-orders endpoint", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+}
+```
+
 ### Katalog exception
 
 ```java
@@ -3579,7 +4182,7 @@ public class GlobalExceptionHandler {
 - Indeksy na kluczach głównych i obcych
 - Walidacje danych (np. CHECK na `RATING`, `DISCOUNT`)
 - Obsługa wyjątków (np. brak na stanie)
-- Blokady pesymistyczne/optimistyczne (opcjonalnie dla zakupów)
+- Blokady pesymistyczne dla równoczesnego dostępu do zasobów
 
 ---
 
@@ -3636,9 +4239,13 @@ public class GlobalExceptionHandler {
 ## 7. Podsumowanie
 
 - Zrealizowano wszystkie operacje CRUD i transakcyjne
-- Wykorzystano Spring + Hibernate + Oracle
-- Największym wyzwaniem była synchronizacja stanu magazynowego przy zakupach
-- System można rozwinąć o: zarządzanie promocjami, logowanie użytkowników, panel admina
+- Spring Data JPA (automatyczne zapytania np. findBy, findAll, integracja z transakcjami
+@Transactional, automatyczny rollback rollbackFor)
+- Hibernate (encje z adnotacjami (@Entity, @Table), relacje (1:1, 1:N, N:M z @JoinTable))
+- Oracle Database (skalowalność, dostępność, sekwencje dla kluczy głównych)
+- Największym wyzwaniem była synchronizacja stanu magazynowego przy zakupach, ale również wielkość
+ bazy danych i liczba endpointów, które należało obsłużyć.
+- System można rozwinąć o: zarządzanie promocjami, logowanie użytkowników, panel administratora
 
 ---
 

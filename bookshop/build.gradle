@@ -14,7 +14,7 @@ java {
 }
 
 repositories {
-    mavenLocal() // jeśli zainstalujesz lokalnie sterownik Oracle
+    mavenLocal() 
     mavenCentral()
 }
 
@@ -27,21 +27,19 @@ dependencies {
     // Oracle JDBC driver
     runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 
-    // Hibernate - dialekty (np. Oracle12cDialect)
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.15.Final'
 
-    // Lombok (jeśli używasz)
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Swagger (opcjonalnie — jeśli chcesz dokumentację REST API)
+    // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     // Testy
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 

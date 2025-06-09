@@ -46,7 +46,7 @@ public class PurchaseService {
     }
 
     /**
-     * pessimistic locking - transakcja zakupu z kontrolą równoczesnego dostępu
+     * pessimistic locking - założyliśmy transakcję zakupu z kontrolą równoczesnego dostępu
      */
     @Transactional(rollbackFor = Exception.class)
     public Order purchaseProducts(PurchaseRequestDTO request) {
@@ -192,7 +192,6 @@ public class PurchaseService {
             throw new RuntimeException("Completed orders cannot be cancelled");
         }
 
-        // Przywrócenie stanu magazynowego
         Order order = entityManager.find(Order.class, orderId);
         if (order != null && order.getOrderDetails() != null) {
             for (OrderDetail detail : order.getOrderDetails()) {

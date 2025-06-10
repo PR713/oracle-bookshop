@@ -49,9 +49,21 @@ public class PurchaseService {
      * pessimistic locking - założyliśmy transakcję zakupu z kontrolą równoczesnego dostępu
      */
     @Transactional(rollbackFor = Exception.class)
-    public Order purchaseProducts(PurchaseRequestDTO request) {
+    public OrderDTO purchaseProducts(PurchaseRequestDTO request) {
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + request.getCustomerId()));
+
+        for (PurchaseItemDTO item : request.getItems()) {
+            Product product = entityManager.find(Product.class, item.getProductId(), LockModeType.PESSIMISTIC_READ);
+            if (product == null) {
+                throw new RuntimeException("Product not found: " + item.getProductId());
+            }
+            if (product.getStock() < item.getQuantity()) {
+                throw new RuntimeException(
+                        String.format("Insufficient stock for product %s. Available: %d, Requested: %d",
+                                product.getName(), product.getStock(), item.getQuantity()));
+            }
+        }
 
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setCustomerId(customer.getCustomerID());
@@ -68,16 +80,6 @@ public class PurchaseService {
             for (PurchaseItemDTO item : request.getItems()) {
                 // PESSIMISTIC LOCK - blokujemy rekord w bazie danych dla race condition
                 Product product = entityManager.find(Product.class, item.getProductId(), LockModeType.PESSIMISTIC_WRITE);
-
-                if (product == null) {
-                    throw new RuntimeException("Product not found: " + item.getProductId());
-                }
-
-                if (product.getStock() < item.getQuantity()) {
-                    throw new RuntimeException(
-                            String.format("Insufficient stock for product %s. Available: %d, Requested: %d",
-                                    product.getName(), product.getStock(), item.getQuantity()));
-                }
 
                 product.setStock(product.getStock() - item.getQuantity());
                 productService.save(product);
@@ -113,7 +115,7 @@ public class PurchaseService {
             throw e;
         }
 
-        return order;
+        return savedOrderDTO;
     }
 
 

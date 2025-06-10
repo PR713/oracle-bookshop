@@ -34,7 +34,7 @@ public class PurchaseController {
     @PostMapping("/create-order")
     public ResponseEntity<?> createOrder(@RequestBody PurchaseRequestDTO request) {
         try {
-            Order order = purchaseService.purchaseProducts(request);
+            OrderDTO order = purchaseService.purchaseProducts(request);
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Order creation failed: " + e.getMessage());

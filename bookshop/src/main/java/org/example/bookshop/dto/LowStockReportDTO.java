@@ -6,12 +6,12 @@ public class LowStockReportDTO {
     private Long productId;
     private String productName;
     private Integer stockQuantity;
-    private BigDecimal price;
+    private Float price;
     private String categoryName;
     private Long recentSales;
 
     public LowStockReportDTO(Long productId, String productName, Integer stockQuantity,
-                             BigDecimal price, String categoryName, Long recentSales) {
+                             Float price, String categoryName, Long recentSales) {
         this.productId = productId;
         this.productName = productName;
         this.stockQuantity = stockQuantity;
@@ -30,8 +30,8 @@ public class LowStockReportDTO {
     public Integer getStockQuantity() { return stockQuantity; }
     public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
 
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public Float getPrice() { return price; }
+    public void setPrice(Float price) { this.price = price; }
 
     public String getCategoryName() { return categoryName; }
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }

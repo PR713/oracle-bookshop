@@ -6,7 +6,8 @@ import java.time.LocalDate;
 
 @Data
 public class PaymentDTO {
-    private Long paymentId;
+    private Long paymentId;// jeśli endpoint POST to ustawione na null,
+    //jeśli PUT to na @PathVariable z URL
 
     @NotNull(message = "Order ID is required")
     private Long orderId;

@@ -1,16 +1,16 @@
 package org.example.bookshop.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class MonthlyOrderDTO {
     private Long orderId;
     private String customerName;
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
     private BigDecimal totalAmount;
     private String orderStatus;
 
-    public MonthlyOrderDTO(Long orderId, String customerName, LocalDateTime orderDate,
+    public MonthlyOrderDTO(Long orderId, String customerName, LocalDate orderDate,
                            BigDecimal totalAmount, String orderStatus) {
         this.orderId = orderId;
         this.customerName = customerName;
@@ -25,8 +25,8 @@ public class MonthlyOrderDTO {
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String customerName) { this.customerName = customerName; }
 
-    public LocalDateTime getOrderDate() { return orderDate; }
-    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
+    public LocalDate getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
 
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }

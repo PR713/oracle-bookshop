@@ -11,7 +11,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -52,13 +52,13 @@ public class ReportingService {
                     .getResultList();
 
             List<LowStockReportDTO> reports = new ArrayList<>();
-            LocalDateTime lastMonth = LocalDateTime.now().minusMonths(1);
+            LocalDate lastMonth = LocalDate.now().minusMonths(1);
 
             for (Object[] row : productResults) {
                 Long productId = (Long) row[0];
                 String productName = (String) row[1];
                 Integer stockQuantity = (Integer) row[2];
-                BigDecimal price = (BigDecimal) row[3];
+                Float price = (Float) row[3];
                 String categoryName = row[4] != null ? (String) row[4] : "Bez kategorii";
 
                 String salesJpql = """
@@ -93,7 +93,7 @@ public class ReportingService {
      * Miesięczny raport zamówień za bieżący miesiąc
      */
     public MonthlyOrdersReportDTO getCurrentMonthOrdersReport() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate now = LocalDate.now();
         int year = now.getYear();
         int month = now.getMonthValue();
 
@@ -120,12 +120,11 @@ public class ReportingService {
             List<MonthlyOrderDTO> orders = new ArrayList<>();
             BigDecimal totalRevenue = BigDecimal.ZERO;
             Long completedOrders = 0L;
-            Long uniqueCustomers = 0L;
 
             for (Object[] row : orderResults) {
                 Long orderId = (Long) row[0];
                 String customerName = (String) row[1];
-                LocalDateTime orderDate = (LocalDateTime) row[2];
+                LocalDate orderDate = (LocalDate) row[2];
                 String orderStatus = (String) row[3];
 
                 String orderValueJpql = """
@@ -134,9 +133,12 @@ public class ReportingService {
                     WHERE od.order.orderID = :orderId
                     """;
 
-                BigDecimal orderValue = entityManager.createQuery(orderValueJpql, BigDecimal.class)
+                Double orderValueDouble = entityManager.createQuery(orderValueJpql, Double.class)
                         .setParameter("orderId", orderId)
                         .getSingleResult();
+
+                BigDecimal orderValue = orderValueDouble != null ?
+                        BigDecimal.valueOf(orderValueDouble) : BigDecimal.ZERO;
 
                 orders.add(new MonthlyOrderDTO(orderId, customerName, orderDate, orderValue, orderStatus));
 
@@ -154,7 +156,7 @@ public class ReportingService {
                 AND o.orderStatus = 'COMPLETED'
                 """;
 
-            uniqueCustomers = entityManager.createQuery(uniqueCustomersJpql, Long.class)
+            Long uniqueCustomers = entityManager.createQuery(uniqueCustomersJpql, Long.class)
                     .setParameter("year", year)
                     .setParameter("month", month)
                     .getSingleResult();

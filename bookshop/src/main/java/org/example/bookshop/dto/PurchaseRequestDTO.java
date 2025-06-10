@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PurchaseRequestDTO {
+public class    PurchaseRequestDTO {
     @NotNull(message = "Customer ID is required")
     private Long customerId;
 

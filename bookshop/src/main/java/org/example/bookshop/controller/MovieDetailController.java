@@ -1,5 +1,6 @@
 package org.example.bookshop.controller;
 
+import jakarta.validation.Valid;
 import org.example.bookshop.dto.MovieDetailDTO;
 import org.example.bookshop.repository.ProductRepository;
 import org.example.bookshop.service.MovieDetailService;
@@ -34,8 +35,8 @@ public class MovieDetailController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping//to little fix 404
-    public ResponseEntity<MovieDetailDTO> createMovie(@RequestBody MovieDetailDTO movieDetailDTO) {
+    @PostMapping
+    public ResponseEntity<MovieDetailDTO> createMovie(@Valid @RequestBody MovieDetailDTO movieDetailDTO) {
         try {
             MovieDetailDTO savedMovie = movieDetailService.save(movieDetailDTO);
             return ResponseEntity.ok(savedMovie);
@@ -46,7 +47,7 @@ public class MovieDetailController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MovieDetailDTO> updateMovie(@PathVariable Long id,
-                                                      @RequestBody MovieDetailDTO movieDetailDTO) {
+                                                      @Valid @RequestBody MovieDetailDTO movieDetailDTO) {
         try {
             movieDetailDTO.setMovieId(id);
             MovieDetailDTO updatedMovie = movieDetailService.save(movieDetailDTO);

@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "// {\r\n//   \"name\": \"Hobbit\",\r\n//   \"price\": 45,\r\n//   \"stock\": 9,\r\n//   \"rating\": 5,\r\n//   \"categoryId\" : 1\r\n// }\r\n",
+					"raw": "// {\r\n//   \"name\": \"Hobbit\",\r\n//   \"price\": 45,\r\n//   \"stock\": 9,\r\n//   \"rating\": 5,\r\n//   \"categoryId\" : 1\r\n// }\r\n//DONT USE\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -74,7 +74,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\" : \"Mikołaj\",\r\n    \"lastName\"  : \"Nowak\",\r\n    \"email\" : \"miki123@agh.student.pl\",\r\n    \"phone\" : \"988 138 438\",\r\n    \"address\" : \"Armii Krajowej 21\",\r\n    \"city\" : \"Kraków\",\r\n    \"postalCode\" : \"30-065\",\r\n    \"country\" : \"Polska\"\r\n\r\n}",
+					"raw": "{\r\n    \"firstName\" : \"Paweł\",\r\n    \"lastName\"  : \"Nowak\",\r\n    \"email\" : \"miki123@agh.student.pl\",\r\n    \"phone\" : \"988 138 438\",\r\n    \"address\" : \"Armii Krajowej 21\",\r\n    \"city\" : \"Kraków\",\r\n    \"postalCode\" : \"30-065\",\r\n    \"country\" : \"Polska\"\r\n\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -102,7 +102,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/customers/1",
+					"raw": "http://localhost:8080/api/customers/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -111,7 +111,27 @@
 					"path": [
 						"api",
 						"customers",
-						"1"
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "customers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"customers"
 					]
 				}
 			},
@@ -124,7 +144,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\" : \"Repcak\",\r\n    \"lastName\"  : \"Kaleipesz\",\r\n    \"email\" : \"repcak.sz@agh.student.pl\",\r\n    \"phone\" : \"988 138 438\",\r\n    \"address\" : \"Tokarskiego 10\",\r\n    \"city\" : \"Kraków\",\r\n    \"postalCode\" : \"30-065\",\r\n    \"country\" : \"Arabia Saudyjska\"\r\n\r\n}",
+					"raw": "{\r\n    \"firstName\" : \"Robert\",\r\n    \"lastName\"  : \"Kaleipesz\",\r\n    \"email\" : \"repcak.sz@agh.student.pl\",\r\n    \"phone\" : \"988 138 438\",\r\n    \"address\" : \"Tokarskiego 10\",\r\n    \"city\" : \"Kraków\",\r\n    \"postalCode\" : \"30-065\",\r\n    \"country\" : \"Arabia Saudyjska\"\r\n\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -132,7 +152,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/customers/2",
+					"raw": "http://localhost:8080/api/customers/5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -141,7 +161,7 @@
 					"path": [
 						"api",
 						"customers",
-						"2"
+						"5"
 					]
 				}
 			},
@@ -194,7 +214,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/products/2",
+					"raw": "http://localhost:8080/api/products/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -203,7 +223,7 @@
 					"path": [
 						"api",
 						"products",
-						"2"
+						"1"
 					]
 				}
 			},
@@ -267,7 +287,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "// {\r\n//     \"customerId\": 2,\r\n//     \"orderDate\": \"2025-06-08T10:30:00\",\r\n//     \"orderStatus\": \"NEW\",\r\n//     \"shipVia\": 1\r\n// }",
+					"raw": "// {\r\n//     \"customerId\": 2,\r\n//     \"orderDate\": \"2025-06-08T10:30:00\",\r\n//     \"orderStatus\": \"NEW\",\r\n//     \"shipVia\": 1\r\n// }\r\n//DONT USE",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -438,7 +458,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"paymentId\": 1,\r\n    \"orderId\": 1,\r\n    \"paymentDate\": \"2025-06-08T11:00:00\",\r\n    \"paymentStatus\": \"PAID\"\r\n}",
+					"raw": "{\r\n    \"orderId\": 34,\r\n    \"paymentDate\": \"2025-06-08T11:00:00\",\r\n    \"paymentStatus\": \"FAILED\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -446,7 +466,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/payments/1",
+					"raw": "http://localhost:8080/api/payments/10",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -455,7 +475,7 @@
 					"path": [
 						"api",
 						"payments",
-						"1"
+						"10"
 					]
 				}
 			},
@@ -489,7 +509,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"customerId\": 1,\r\n    \"items\": [\r\n        {\r\n            \"productId\": 1,\r\n            \"quantity\": 1,\r\n            \"unitPrice\": 29.99,\r\n            \"discount\": 0.21\r\n        }\r\n    ]\r\n}",
+					"raw": "{\r\n    \"customerId\": 5,\r\n    \"items\": [\r\n        {\r\n            \"productId\": 5,\r\n            \"quantity\": 1,\r\n            \"unitPrice\": 29.99,\r\n            \"discount\": 0.21\r\n        },\r\n        {\r\n            \"productId\": 3,\r\n            \"quantity\": 1,\r\n            \"unitPrice\": 29.99,\r\n            \"discount\": 0.21\r\n        }\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -577,7 +597,7 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/purchase/complete/6",
+					"raw": "http://localhost:8080/api/purchase/complete/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -587,7 +607,7 @@
 						"api",
 						"purchase",
 						"complete",
-						"6"
+						"1"
 					]
 				}
 			},
@@ -665,8 +685,17 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8080/api/purchase/retry-payment/1",
+					"raw": "http://localhost:8080/api/purchase/retry-payment/34",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -676,7 +705,7 @@
 						"api",
 						"purchase",
 						"retry-payment",
-						"1"
+						"34"
 					]
 				}
 			},
@@ -742,7 +771,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "// {\r\n//     \"product\": {\r\n//         \"name\": \"Avengers: Endgame\",\r\n//         \"price\": 29.99,\r\n//         \"stock\": 100,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Anthony Russo\",\r\n//     \"durationInMinutes\": 181,\r\n//     \"releaseYear\": 2019,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Action\",\r\n//     \"description\": \"Epic superhero finale\"\r\n// }\r\n\r\n// {\r\n//     \"product\": {\r\n//         \"name\": \"Avengers: Endgame\",\r\n//         \"price\": 29.99,\r\n//         \"stock\": 100,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Anthony Russo\",\r\n//     \"durationInMinutes\": 181,\r\n//     \"releaseYear\": 2019,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Action\",\r\n//     \"description\": \"Epic superhero finale\"\r\n// }\r\n\r\n// {\r\n//     \"product\": {\r\n//         \"name\": \"The Dark Knight\",\r\n//         \"price\": 24.99,\r\n//         \"stock\": 0,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Christopher Nolan\",\r\n//     \"durationInMinutes\": 152,\r\n//     \"releaseYear\": 2008,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Crime\",\r\n//     \"description\": \"Batman's greatest challenge\"\r\n// }\r\n\r\n// {\r\n//     \"product\": {\r\n//         \"name\": \"Inception\",\r\n//         \"price\": 22.99,\r\n//         \"stock\": 1,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Christopher Nolan\",\r\n//     \"durationInMinutes\": 148,\r\n//     \"releaseYear\": 2010,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Sci-Fi\",\r\n//     \"description\": \"Dream within a dream\"\r\n// }\r\n\r\n{\r\n    \"product\": {\r\n        \"name\": \"The Shawshank \",\r\n        \"price\": 22.99,\r\n        \"stock\": 7,\r\n        \"rating\": 4.5\r\n    },\r\n    \"director\": \"Frank Darabont\",\r\n    \"durationInMinutes\": 142,\r\n    \"releaseYear\": 1994,\r\n    \"language\": \"English\",\r\n    \"genre\": \"Drama\",\r\n    \"description\": \"Hope conquers all\"\r\n}\r\n",
+					"raw": "// {\r\n//     \"product\": {\r\n//         \"name\": \"Avengers: Endgame\",\r\n//         \"price\": 29.99,\r\n//         \"stock\": 100,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Anthony Russo\",\r\n//     \"durationInMinutes\": 181,\r\n//     \"releaseYear\": 2019,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Action\",\r\n//     \"description\": \"Epic superhero finale\"\r\n// }\r\n\r\n// {\r\n//     \"product\": {\r\n//         \"name\": \"Avengers: Endgame\",\r\n//         \"price\": 29.99,\r\n//         \"stock\": 100,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Anthony Russo\",\r\n//     \"durationInMinutes\": 181,\r\n//     \"releaseYear\": 2019,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Action\",\r\n//     \"description\": \"Epic superhero finale\"\r\n// }\r\n\r\n// {\r\n//     \"product\": {\r\n//         \"name\": \"The Dark Knight\",\r\n//         \"price\": 24.99,\r\n//         \"stock\": 0,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Christopher Nolan\",\r\n//     \"durationInMinutes\": 152,\r\n//     \"releaseYear\": 2008,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Crime\",\r\n//     \"description\": \"Batman's greatest challenge\"\r\n// }\r\n\r\n// {\r\n//     \"product\": {\r\n//         \"name\": \"Inception\",\r\n//         \"price\": 22.99,\r\n//         \"stock\": 1,\r\n//         \"rating\": 5\r\n//     },\r\n//     \"director\": \"Christopher Nolan\",\r\n//     \"durationInMinutes\": 148,\r\n//     \"releaseYear\": 2010,\r\n//     \"language\": \"English\",\r\n//     \"genre\": \"Sci-Fi\",\r\n//     \"description\": \"Dream within a dream\"\r\n// }\r\n\r\n{\r\n    \"product\": {\r\n        \"name\": \"Laboratoria \",\r\n        \"price\": 22.99,\r\n        \"stock\": 7,\r\n        \"rating\": 4.5\r\n    },\r\n    \"director\": \"Frank Darabont\",\r\n    \"durationInMinutes\": 142,\r\n    \"releaseYear\": 1994,\r\n    \"language\": \"English\",\r\n    \"genre\": \"Drama\",\r\n    \"description\": \"Hope conquers all\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"

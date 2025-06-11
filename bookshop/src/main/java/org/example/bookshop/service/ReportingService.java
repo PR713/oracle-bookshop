@@ -128,7 +128,7 @@ public class ReportingService {
                 String orderStatus = (String) row[3];
 
                 String orderValueJpql = """
-                    SELECT COALESCE(SUM(od.quantity * od.unitPrice), 0)
+                    SELECT COALESCE(SUM(od.quantity * od.unitPrice * (1 - od.discount)), 0)
                     FROM OrderDetail od
                     WHERE od.order.orderID = :orderId
                     """;
